@@ -133,7 +133,7 @@ def api_list_sales_record(request):
 @require_http_methods(["GET", "PUT", "DELETE"])
 def api_show_sales_record(request, pk):
     if request.method == "GET":
-        sales_record = SalesPerson.objects.get(id=pk)
+        sales_record = SalesRecord.objects.get(id=pk)
         return JsonResponse(
             sales_record,
             encoder=SalesRecordEncoder,
