@@ -38,6 +38,15 @@ class ManufacturerForm extends React.Component {
         this.setState({ name: value })
     }
 
+    async componentDedMount() {
+        const url = 'http://localhost:8100/api/manufacturers/';
+        const response = await fetch(url);
+        if (response.ok) {
+            const data = await response.json();
+            this.setState({ manufacturers: data.manufacturers });
+        }
+    }
+
     render() {
         return (<div className="row">
             <div className="offset-3 col-6">
