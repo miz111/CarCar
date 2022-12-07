@@ -48,24 +48,25 @@ class ManufacturerForm extends React.Component {
     }
 
     render() {
-        return (<div className="row">
-            <div className="offset-3 col-6">
-                <div className="shadow p-4 mt-4">
-                    <h1>Create a Manufacturer</h1>
-                    <form onSubmit={this.handleSubmit} id="create-manufacturer-form">
-                        <div className="form-floating mb-3">
-                            <input value={this.state.name} onChange={this.handleNameChange} placeholder="Manufacturer name" required type="text" name="name" id="name"
-                                className="form-control" />
-                            <label htmlFor="name">Name</label>
+        return (
+            <div className="row">
+                <div className="offset-3 col-6">
+                    <div className="shadow p-4 mt-4">
+                        <h1>Create a Manufacturer</h1>
+                        <form onSubmit={this.handleSubmit} id="create-manufacturer-form">
+                            <div className="form-floating mb-3">
+                                <input value={this.state.name} onChange={this.handleNameChange} placeholder="Manufacturer name" required type="text" name="name" id="name"
+                                    className="form-control" />
+                                <label htmlFor="name">Name</label>
+                            </div>
+                            <button className="btn btn-primary">Create</button>
+                        </form>
+                        <div className="alert alert-success d-none mb-0" id="success-message">
+                            Manufacturer created!
                         </div>
-                        <button className="btn btn-primary">Create</button>
-                    </form>
-                    <div className="alert alert-success d-none mb-0" id="success-message">
-                        Manufacturer created!
                     </div>
                 </div>
             </div>
-        </div>
         )
     }
 }
