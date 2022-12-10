@@ -19,11 +19,14 @@ def find_automobile():
     for auto in content["autos"]:
         AutomobileVO.objects.update_or_create(
             import_href=auto["href"],
-            color=auto["color"],
-            year=auto["year"],
-            vin=auto["vin"],
-            model_name=auto["model"]["name"],
-            is_sold=auto["is_sold"]
+            defaults={
+            "color": auto["color"],
+            "year": auto["year"],
+            "vin": auto["vin"],
+            "model_name": auto["model"]["name"],
+            "is_sold": auto["is_sold"],
+            "import_href": auto["href"],
+            }
 
         )
 

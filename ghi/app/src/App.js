@@ -10,6 +10,7 @@ import SalesRecordForm from './SalesRecordForm'
 import SalesList from './SalesList'
 import CustomerList from './CustomerList'
 import SalesPersonList from './SalesPersonList'
+import SalesHistory from './SalesHistory'
 
 function App() {
   return (
@@ -35,6 +36,7 @@ function App() {
             <Route path="" element={<SalesList />} />
             <Route path="new" element={<SalesRecordForm />} />
           </Route>
+          <Route path="sales-history" element={<SalesHistory />} />
         </Routes>
       </div>
     </BrowserRouter>

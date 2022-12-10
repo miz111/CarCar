@@ -151,3 +151,11 @@ def api_show_sales_record(request, pk):
             encoder=SalesRecordEncoder,
             safe=False,
         )
+
+@require_http_methods(["GET"])
+def api_list_sales_history(request, sales_person_id):
+    sales_records = SalesRecord.objects.filter(sales_person=sales_person_id)
+    return JsonResponse(
+        {"sales_records": sales_records},
+        encoder=SalesRecordEncoder,
+    )

@@ -12,6 +12,7 @@ class SalesRecordForm extends React.Component {
             automobiles: [],
             salesPersons: [],
             customers: [],
+            unsoldAutos: [],
         };
         this.handleAutomobileChange = this.handleAutomobileChange.bind(this);
         this.handleSalesPersonChange = this.handleSalesPersonChange.bind(this);
@@ -24,12 +25,13 @@ class SalesRecordForm extends React.Component {
         event.preventDefault();
         const data = { ...this.state };
         data.sales_person = data.salesPerson;
+        delete data.salesPerson;
         data.vin = data.automobile;
         delete data.automobile;
-        delete data.salesPerson;
         delete data.automobiles;
         delete data.salesPersons;
         delete data.customers;
+        delete data.unsoldAutos;
 
         const salesRecordUrl = 'http://localhost:8090/api/salesrecord/';
         const fetchConfig = {
@@ -41,16 +43,28 @@ class SalesRecordForm extends React.Component {
         };
         console.log(data);
         const response = await fetch(salesRecordUrl, fetchConfig)
-        if (response.ok) {
+
+        const autoUrl = `http://localhost:8100/api/automobiles/${this.state.automobile}/`
+        const fetchConfig1 = {
+            method: "put",
+            body: JSON.stringify({ "is_sold": true }),
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        }
+        const updateSold = await fetch(autoUrl, fetchConfig1)
+
+        if (response.ok && updateSold.ok) {
             const alert = document.getElementById("success-message");
             alert.classList.remove("d-none");
             const cleared = {
                 price: '',
                 automobile: '',
                 salesPerson: '',
-                customer: ''
+                customer: '',
             };
             this.setState(cleared);
+            this.componentDidMount();
         }
     }
     handleAutomobileChange(event) {
@@ -85,6 +99,9 @@ class SalesRecordForm extends React.Component {
             const data2 = await response2.json();
             const data3 = await response3.json();
             this.setState({ automobiles: data1.autos, salesPersons: data2.sales_persons, customers: data3.customers });
+            this.setState({
+                unsoldAutos: this.state.automobiles.filter((auto) => { return !auto.is_sold })
+            });
         }
     }
 
@@ -116,7 +133,7 @@ class SalesRecordForm extends React.Component {
                             <div className="mb-3">
                                 <select value={this.state.automobile} onChange={this.handleAutomobileChange} required name="automobile" id="automobile" className="form-select">
                                     <option value="">Choose an Automobile</option>
-                                    {this.state.automobiles.map(automobile => {
+                                    {this.state.unsoldAutos.map(automobile => {
                                         return (
                                             <option key={automobile.id} value={automobile.vin}>
                                                 {automobile.model.name}
