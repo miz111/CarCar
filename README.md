@@ -130,7 +130,7 @@ The REST API for the sales microservice is detailed below.
 | GET    | /api/salesrecord/:id/             | Get the details of a sales record                       |
 | POST   | /api/salesrecord/                 | Create a sales record                                   |
 | PUT    | /api/salesrecord/:id/             | Edit a sales record                                     |
-##### Note that a request to delete sales records does not exist. From an industrial standpoint, sales records should be permanent, so a delete request method was not implemented.
+##### Note that a request to delete sales records does not exist. From an business standpoint, sales records should be permanent, so a delete request method was not implemented.
 
 ### Get a list of all sales persons
 ---
