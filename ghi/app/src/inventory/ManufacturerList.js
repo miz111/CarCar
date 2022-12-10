@@ -21,7 +21,7 @@ const ManufacturerList = () => {
     return (
         <>
             <div className="container mt-5">
-                <Link to="/manufacturer/new">
+                <Link to="/manufacturers/new">
                     <button type="button" className="btn btn-success btn-md px-4">Add Manufacturer</button>
                 </Link>
 

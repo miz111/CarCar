@@ -70,7 +70,7 @@ class VehicleList extends React.Component {
                   </td>
                   <td>
                     <button
-                      onClick={this.deleteAutomobile}
+                      onClick={this.deleteVehicle}
                       value={model.href}
                       className="btn btn-danger fw-bold"
                     >

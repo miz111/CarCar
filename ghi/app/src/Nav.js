@@ -35,10 +35,7 @@ function Nav() {
                 aria-labelledby="dropdownInventoryMenu"
               >
                 <li className="nav-item">
-                  <NavLink
-                    className="dropdown-item"
-                    to="/automobiles"
-                  >
+                  <NavLink className="dropdown-item" to="/automobiles">
                     Automobiles
                   </NavLink>
                 </li>
@@ -54,7 +51,7 @@ function Nav() {
                 </li>
               </ul>
             </div>
-            <li className="dropdown">
+            <div className="dropdown">
               <button
                 className="btn dropdown-toggle text-white"
                 type="button"
@@ -64,22 +61,14 @@ function Nav() {
               >
                 Sales
               </button>
-              <ul
-                className="dropdown-menu"
-                aria-labelledby="dropdownSalesMenu"
-              >
+              <ul className="dropdown-menu" aria-labelledby="dropdownSalesMenu">
                 <li className="nav-item">
-                  <NavLink className="dropdown-item" to="/customers">
+                  <NavLink className="dropdown-item" to="/customer">
                     Customers
                   </NavLink>
                 </li>
                 <li className="nav-item">
-                  <NavLink className="dropdown-item" to="/sales-records">
-                    Sales Records
-                  </NavLink>
-                </li>
-                <li className="nav-item">
-                  <NavLink className="dropdown-item" to="/salespersons">
+                  <NavLink className="dropdown-item" to="/salesperson">
                     Sales Agents
                   </NavLink>
                 </li>
@@ -88,8 +77,13 @@ function Nav() {
                     Sales History
                   </NavLink>
                 </li>
+                <li className="nav-item">
+                  <NavLink className="dropdown-item" to="/sales-record">
+                    Sales Records
+                  </NavLink>
+                </li>
               </ul>
-            </li>
+            </div>
             <div className="dropdown">
               <button
                 className="btn dropdown-toggle text-white"

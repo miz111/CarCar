@@ -1,26 +1,26 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import MainPage from "./MainPage";
 import Nav from "./Nav";
-import ManufacturerList from "./ManufacturerList";
-import ManufacturerForm from "./ManufacturerForm";
-import VehicleList from "./VehicleList";
-import VehicleForm from "./VehicleForm";
-import AutomobileList from "./AutomobileList";
-import AutomobileForm from "./AutomobileForm";
-import SalesList from "./SalesList";
-import SalesRecordForm from "./SalesRecordForm";
-import CustomerList from "./CustomerList";
-import CustomerForm from "./CustomerForm";
-import SalesPersonList from "./SalesPersonList";
-import SalesPersonForm from "./SalesPersonForm";
-import SalesHistory from "./SalesHistory";
-import AppointmentList from "./AppointmentList";
-import AppointmentForm from "./AppointmentForm";
-import AppointmentHistory from "./AppointmentHistory";
-import AppointmentFilter from "./AppointmentFilter";
-import TechnicianForm from "./TechnicianForm";
-import TechnicianList from "./TechnicianList";
-import TechnicianEdit from "./TechnicianEdit";
+import ManufacturerList from "./inventory/ManufacturerList";
+import ManufacturerForm from "./inventory/ManufacturerForm";
+import VehicleList from "./inventory/VehicleList";
+import VehicleForm from "./inventory/VehicleForm";
+import AutomobileList from "./inventory/AutomobileList";
+import AutomobileForm from "./inventory/AutomobileForm";
+import SalesList from "./sales/SalesList";
+import SalesRecordForm from "./sales/SalesRecordForm";
+import CustomerList from "./sales/CustomerList";
+import CustomerForm from "./sales/CustomerForm";
+import SalesPersonList from "./sales/SalesPersonList";
+import SalesPersonForm from "./sales/SalesPersonForm";
+import SalesHistory from "./sales/SalesHistory";
+import AppointmentList from "./services/AppointmentList";
+import AppointmentForm from "./services/AppointmentForm";
+import AppointmentHistory from "./services/AppointmentHistory";
+import AppointmentFilter from "./services/AppointmentFilter";
+import TechnicianForm from "./services/TechnicianForm";
+import TechnicianList from "./services/TechnicianList";
+import TechnicianEdit from "./services/TechnicianEdit";
 
 function App() {
   return (
@@ -29,7 +29,7 @@ function App() {
       <div className="container">
         <Routes>
           <Route path="/" element={<MainPage />} />
-          <Route path="manufacturer">
+          <Route path="manufacturers">
             <Route index element={<ManufacturerList />} />
             <Route path="new" element={<ManufacturerForm />} />
           </Route>
