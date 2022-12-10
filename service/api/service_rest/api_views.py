@@ -1,6 +1,7 @@
 from django.http import JsonResponse
 from django.views.decorators.http import require_http_methods
 import json
+from django.db import IntegrityError
 
 from .encoders import (
     TechnicianEncoder,
@@ -164,7 +165,16 @@ def api_show_technician(request, pk):
             for prop in props:
                 if prop in content:
                     setattr(technician, prop, content[prop])
-            technician.save()
+
+            try:
+                technician.save()
+            except IntegrityError:
+                return JsonResponse(
+                    {
+                        "message": "There is a technician with that employee number already."
+                    },
+                    status=400,
+                )
 
             return JsonResponse(
                 technician,
