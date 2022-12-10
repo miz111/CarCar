@@ -8,28 +8,46 @@ Team:
 * **Person 1:** Martey (Service)
 * **Person 2:** Jess (Sales)
 
-# Table of Contents
-
-[**CarCar**](#CarCar)
-  - [Design](#design)
+- [**CarCar**](#carcar)
   - [Setup Guide](#setup-guide)
   - [Need to reset your PostgreSQL database?](#need-to-reset-your-postgresql-database)
+  - [Design](#design)
   - [Sales Microservice](#sales-microservice)
-    - [RESTful Shoes API](#restful-shoes-api)
-    - [Get a list of all shoes or filter by bin](#get-a-list-of-all-shoes-or-filter-by-bin)
-    - [Get the details of a shoe](#get-the-details-of-a-shoe)
-    - [Create a shoe](#create-a-shoe)
-    - [Create a shoe without an existing bin](#create-a-shoe-without-an-existing-bin)
-    - [Delete a shoe](#delete-a-shoe)
-    - [Delete a deleted shoe](#delete-a-deleted-shoe)
-  - [Hats microservice](#hats-microservice)
-    - [RESTful Hats API](#restful-hats-api)
-    - [Get a list of all hats or filter by location](#get-a-list-of-all-hats-or-filter-by-location)
-    - [Get the details of a hat](#get-the-details-of-a-hat)
-    - [Create a hat](#create-a-hat)
-    - [Create a hat without an existing location](#create-a-hat-without-an-existing-location)
-    - [Delete a hat](#delete-a-hat)
-    - [Delete a deleted hat](#delete-a-deleted-hat)
+    - [RESTful Sales API](#restful-sales-api)
+    - [Get a list of all sales persons](#get-a-list-of-all-sales-persons)
+    - [Get details on a sales person](#get-details-on-a-sales-person)
+    - [Create a sales person](#create-a-sales-person)
+    - [Edit a sales person](#edit-a-sales-person)
+    - [Delete a sales person](#delete-a-sales-person)
+    - [Get a list of all customers](#get-a-list-of-all-customers)
+    - [Get details on a Customer](#get-details-on-a-customer)
+    - [Edit a customer](#edit-a-customer)
+    - [Delete a customer](#delete-a-customer)
+    - [Get a list of all sales records](#get-a-list-of-all-sales-records)
+    - [Get sales records filtered by sales person](#get-sales-records-filtered-by-sales-person)
+    - [Get details on a Sales Record](#get-details-on-a-sales-record)
+    - [Create a sales record](#create-a-sales-record)
+    - [Edit a sales record](#edit-a-sales-record)
+  - [Models](#models)
+  - [Inventory Microservice](#inventory-microservice)
+    - [RESTful Inventory API](#restful-inventory-api)
+    - [Get a list of all manufacturers](#get-a-list-of-all-manufacturers)
+    - [Get details on a manufacturer](#get-details-on-a-manufacturer)
+    - [Create a Manufacturer](#create-a-manufacturer)
+    - [Edit a manufacturer](#edit-a-manufacturer)
+    - [Delete a manufacturer](#delete-a-manufacturer)
+    - [Get a list of all vehicle models](#get-a-list-of-all-vehicle-models)
+    - [Get details on a vehicle model](#get-details-on-a-vehicle-model)
+    - [Create a Vehicle Model](#create-a-vehicle-model)
+    - [Edit a vehicle model](#edit-a-vehicle-model)
+    - [Delete a vehicle model](#delete-a-vehicle-model)
+    - [Get a list of all automobiles](#get-a-list-of-all-automobiles)
+    - [Get details on an automobile](#get-details-on-an-automobile)
+    - [Create an automobile](#create-an-automobile)
+    - [Edit an automobile](#edit-an-automobile)
+    - [Delete an automobile](#delete-an-automobile)
+  - [Models](#models-1)
+
 ## Setup Guide
 ---
 ### 1. Get Docker [here](https://docs.docker.com/get-docker/) or using your terminal:
@@ -44,7 +62,13 @@ Team:
 
 ### 2. Run the Docker Application
 
-### 3. **Fork** [this](https://gitlab.com/Jeffery-Hebert/microservice-two-shot) repository and then **clone** into a local directory
+### 3. **Fork** [this](https://gitlab.com/martey.haw/project-beta) repository, then **clone** into a \<local directory> and navigate into the \<local directory>.
+```
+cd <projects folder>
+md <local directory>
+git clone https://gitlab.com/martey.haw/project-beta.git
+cd <local directory>
+```
 
 ### 4. Create a Docker volume for your PostgreSQL database
 
@@ -89,7 +113,7 @@ docker-compose up
 
 ## Design
 ---
-![wardrobify-simple-diagram](./img/wardrobify-simple-diagram.jpg)
+
 - front-end: http://localhost:3000/
 
 - inventory-api: http://localhost:8100/
@@ -130,7 +154,7 @@ The REST API for the sales microservice is detailed below.
 | GET    | /api/salesrecord/:id/             | Get the details of a sales record                       |
 | POST   | /api/salesrecord/                 | Create a sales record                                   |
 | PUT    | /api/salesrecord/:id/             | Edit a sales record                                     |
-##### Note that a request to delete sales records does not exist. From an business standpoint, sales records should be permanent, so a delete request method was not implemented.
+##### Note that a request to delete sales records does not exist. From an industrial standpoint, sales records should be permanent, so a delete request method was not implemented.
 
 ### Get a list of all sales persons
 ---
