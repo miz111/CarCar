@@ -1,5 +1,4 @@
 import React from 'react';
-// import CurrencyInput from '../components/CurrencyInput'
 
 class SalesRecordForm extends React.Component {
     constructor(props) {
@@ -105,23 +104,6 @@ class SalesRecordForm extends React.Component {
         }
     }
 
-    // async componentDidMount() {
-    //     const url = 'http://localhost:8090/api/salesperson/'
-    //     const response = await fetch(url);
-    //     if (response.ok) {
-    //         const data = await response.json();
-    //         this.setState({ salesPersons: data.salesPerson })
-    //     }
-    // }
-
-    // async componentDidMount() {
-    //     const url = 'http://localhost:8090/api/customer/'
-    //     const response = await fetch(url);
-    //     if (response.ok) {
-    //         const data = await response.json();
-    //         this.setState({ customers: data.customers })
-    //     }
-    // }
 
     render() {
         return (
