@@ -25,8 +25,6 @@ class SalesHistory extends React.Component {
         },
             100)
 
-        // const alert = document.getElementById("success-message");
-        // alert.classList.remove("d-none");
 
     }
 

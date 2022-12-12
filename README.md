@@ -14,6 +14,7 @@ Team:
   - [Design](#design)
   - [Sales Microservice](#sales-microservice)
     - [RESTful Sales API](#restful-sales-api)
+    - [Sales Models](#sales-models)
     - [Get a list of all sales persons](#get-a-list-of-all-sales-persons)
     - [Get details on a sales person](#get-details-on-a-sales-person)
     - [Create a sales person](#create-a-sales-person)
@@ -28,7 +29,7 @@ Team:
     - [Get details on a Sales Record](#get-details-on-a-sales-record)
     - [Create a sales record](#create-a-sales-record)
     - [Edit a sales record](#edit-a-sales-record)
-  - [Models](#models)
+
   - [Inventory Microservice](#inventory-microservice)
     - [RESTful Inventory API](#restful-inventory-api)
     - [Get a list of all manufacturers](#get-a-list-of-all-manufacturers)
@@ -155,6 +156,48 @@ The REST API for the sales microservice is detailed below.
 | POST   | /api/salesrecord/                 | Create a sales record                                   |
 | PUT    | /api/salesrecord/:id/             | Edit a sales record                                     |
 ##### Note that a request to delete sales records does not exist. From an industrial standpoint, sales records should be permanent, so a delete request method was not implemented.
+
+### Sales Models
+---
+ **AutomobileVO**
+#### The AutomobileVO object is based off of the Automobile model from the inventory microservice.
+| Attribute   |  Type   |           Options           |                 Description                 |
+| ----------- | :-----: | :-------------------------: | :-----------------------------------------: |
+| color       | string  |        max. 50 chars        |         the color of the automobile         |
+| year        | integer |                             |    the year aumotobile was manufactured     |
+| vin         | string  | max. 17 chars, unique=True  |            unique automobile vin            |
+| import_href | string  | max. 200 chars, unique=True |     unique identifier used for polling      |
+| model_name  | string  |       max. 100 chars        |      the name of the automobile model       |
+| is_sold     | boolean |        default=False        | whether the automobile has been sold or not |
+
+ **Sales Person**
+
+| Attribute       |  Type   |    Options     |                Description                |
+| --------------- | :-----: | :------------: | :---------------------------------------: |
+| name            | string  | max. 200 chars |       the name of the sales person        |
+| employee_number | integer |  unique=True   | the sales person's unique employee number |
+
+ **Customer**
+
+| Attribute    |  Type  |          Options           |           Description            |
+| ------------ | :----: | :------------------------: | :------------------------------: |
+| name         | string |       max. 200 chars       |     the name of the customer     |
+| address      | string |       max. 200 chars       |   the address of the customer    |
+| phone_number | string | max. 20 chars, unique=True | the phone number of the customer |
+
+ **Sales Record**
+
+| Attribute    |    Type     |             Options              |                     Description                      |
+| ------------ | :---------: | :------------------------------: | :--------------------------------------------------: |
+| price        |   decimal   | max. 10 chars, max 2 dec. places |          the price automobile was sold for           |
+| automobile   | foreign key |        on_delete=PROTECT         |    the model name of the automobile that was sold    |
+| sales_person | foreign key |        on_delete=PROTECT         | the sales person who completed the sales transaction |
+| customer     | foreign key |        on_delete=PROTECT         |      the customer who purchased the automobile       |
+
+#### The attributes in each model are used to describe or identify an object. The options are the limitations for the value of the objects. For instance, it is not possible to input a string for the year of an automobile because it has been specified to be an integer field. Foreign keys have significance as they describe the dependancy between the model object and the attribute. Specifically for sales records, any automobile, sales_person, or customer that has a sales record will be protected because it is not possible to delete a sales record.
+
+**Value Objects**
+#### Customers, sales persons, and sales records are their own entities, while the attributes that describe them are value objects. They are intrinsic for describing an entity, so they are implemented as an attribute. Note that in the model for sales record, each automobile, sales_person, and customer is acting as a value obejct that describes the sales record.
 
 ### Get a list of all sales persons
 ---
@@ -878,46 +921,6 @@ The REST API for the sales microservice is detailed below.
 	"id": 1
 }
 ```
-## Models
- **AutomobileVO**
-#### The AutomobileVO object is based off of the Automobile model from the inventory microservice.
-| Attribute   |  Type   |           Options           |
-| ----------- | :-----: | :-------------------------: |
-| color       | string  |        max. 50 chars        |
-| year        | integer |                             |
-| vin         | string  | max. 17 chars, unique=True  |
-| import_href | string  | max. 200 chars, unique=True |
-| model_name  | string  |       max. 100 chars        |
-| is_sold     | boolean |        default=False        |
-
- **Sales Person**
-
-| Attribute       |  Type   |    Options     |
-| --------------- | :-----: | :------------: |
-| name            | string  | max. 200 chars |
-| employee_number | integer |  unique=True   |
-
- **Customer**
-
-| Attribute    |  Type  |          Options           |
-| ------------ | :----: | :------------------------: |
-| name         | string |       max. 200 chars       |
-| address      | string |       max. 200 chars       |
-| phone_number | string | max. 20 chars, unique=True |
-
- **Sales Record**
-
-| Attribute    |    Type     |             Options              |
-| ------------ | :---------: | :------------------------------: |
-| price        |   decimal   | max. 10 chars, max 2 dec. places |
-| automobile   | foreign key |        on_delete=PROTECT         |
-| sales_person | foreign key |        on_delete=PROTECT         |
-| customer     | foreign key |        on_delete=PROTECT         |
-
-#### The attributes in each model are used to describe or identify an object. The options are the limitations for the value of the objects. For instance, it is not possible to input a string for the year of an automobile because it has been specified to be an integer field. Foreign keys have significance as they describe the dependancy between the model object and the attribute. Specifically for sales records, any automobile, sales_person, or customer that has a sales record will be protected because it is not possible to delete a sales record.
-
-**Value Objects**
-#### Customers, sales persons, and sales records are their own entities, while the attributes that describe them are value objects. They are intrinsic for describing an entity, so they are implemented as an attribute. Note that in the model for sales record, each automobile, sales_person, and customer is acting as a value obejct that describes the sales record.
 
 ## Inventory Microservice
 ---
@@ -1635,7 +1638,7 @@ The REST API for the inventory microservice is detailed below.
 	"is_sold": false
 }
 ```
-## Models
+## Inventory Models
  **Manufacturer**
 | Attribute |  Type  |           Options           |
 | --------- | :----: | :-------------------------: |
