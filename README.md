@@ -19,18 +19,6 @@ Team:
   - [Service microservice](#service-microservice)
     - [Service API Models](#service-api-models)
     - [RESTful Service API](#restful-service-api)
-      - [Get a list of appointments](#get-a-list-of-appointments)
-      - [Create an appointment](#create-an-appointment)
-      - [Create an appointment with invalid input](#create-an-appointment-with-invalid-input)
-      - [Get the details of an appointment](#get-the-details-of-an-appointment)
-      - [Get the details of an appointment that does not exist](#get-the-details-of-an-appointment-that-does-not-exist)
-      - [Modify the details of an appointment](#modify-the-details-of-an-appointment)
-      - [Modify the details of an appointment that does not exist, or with invalid input](#modify-the-details-of-an-appointment-that-does-not-exist-or-with-invalid-input)
-      - [Delete an appointment](#delete-an-appointment)
-      - [Delete a deleted appointment, or an appointment that does not exist](#delete-a-deleted-appointment-or-an-appointment-that-does-not-exist)
-      - [Mark an appointment as finished](#mark-an-appointment-as-finished)
-      - [Mark an appointment as finished for an appointment that does not exist](#mark-an-appointment-as-finished-for-an-appointment-that-does-not-exist)
-      - ---
       - [Get a list of technicians](#get-a-list-of-technicians)
       - [Create a technician](#create-a-technician)
       - [Create a technician with invalid input](#create-a-technician-with-invalid-input)
@@ -41,6 +29,18 @@ Team:
       - [Delete a technician](#delete-a-technician)
       - [Delete a deleted technician, or a technician that does not exist](#delete-a-deleted-technician-or-a-technician-that-does-not-exist)
       - [Delete a technician associated to an appointment](#delete-a-technician-associated-to-an-appointment)
+      -  ---
+	   - [Get a list of appointments](#get-a-list-of-appointments)
+      - [Create an appointment](#create-an-appointment)
+      - [Create an appointment with invalid input](#create-an-appointment-with-invalid-input)
+      - [Get the details of an appointment](#get-the-details-of-an-appointment)
+      - [Get the details of an appointment that does not exist](#get-the-details-of-an-appointment-that-does-not-exist)
+      - [Modify the details of an appointment](#modify-the-details-of-an-appointment)
+      - [Modify the details of an appointment that does not exist, or with invalid input](#modify-the-details-of-an-appointment-that-does-not-exist-or-with-invalid-input)
+      - [Delete an appointment](#delete-an-appointment)
+      - [Delete a deleted appointment, or an appointment that does not exist](#delete-a-deleted-appointment-or-an-appointment-that-does-not-exist)
+      - [Mark an appointment as finished](#mark-an-appointment-as-finished)
+      - [Mark an appointment as finished for an appointment that does not exist](#mark-an-appointment-as-finished-for-an-appointment-that-does-not-exist)
   - [Sales Microservice](#sales-microservice)
     - [Sales API Models](#sales--api-models)
     - [RESTful Sales API](#restful-sales-api)
@@ -236,6 +236,18 @@ The REST API for the `service-api` microservice is detailed below.
 
 <br>
 
+#### **Technicians**
+
+| Method | URL                   | What it does                       |
+| ------ | :-------------------- | :--------------------------------- |
+| GET    | /api/technicians/     | Get a list of technicians          |
+| POST   | /api/technicians/     | Create a technician                |
+| GET    | /api/technicians/:id/ | Get the details of a technician    |
+| PUT    | /api/technicians/:id/ | Modify the details of a technician |
+| DELETE | /api/technicians/:id/ | Delete a technician                |
+
+<br>
+
 #### **Service appointments**
 
 | Method | URL                           | What it does                         |
@@ -249,15 +261,381 @@ The REST API for the `service-api` microservice is detailed below.
 
 <br>
 
-#### **Technicians**
+### Get a list of technicians
+---
+#### **Request**
 
-| Method | URL                   | What it does                       |
-| ------ | :-------------------- | :--------------------------------- |
-| GET    | /api/technicians/     | Get a list of technicians          |
-| POST   | /api/technicians/     | Create a technician                |
-| GET    | /api/technicians/:id/ | Get the details of a technician    |
-| PUT    | /api/technicians/:id/ | Modify the details of a technician |
-| DELETE | /api/technicians/:id/ | Delete a technician                |
+`GET /api/technicians/`
+
+    http://localhost:8080/api/technicians/
+
+#### **Response**
+
+```yaml
+< HTTP/1.1 200 OK
+< Date: Mon, 12 Dec 2022 09:31:12 GMT
+< Server: WSGIServer/0.2 CPython/3.10.9
+< Content-Type: application/json
+< X-Frame-Options: DENY
+< Content-Length: 288
+< X-Content-Type-Options: nosniff
+< Referrer-Policy: same-origin
+< Cross-Origin-Opener-Policy: same-origin
+< Vary: Origin
+```
+```json
+{
+	"technicians": [
+		{
+			"href": "/api/technicians/1/",
+			"id": 1,
+			"name": "Balor Rayhana",
+			"employee_number": 1
+		},
+		{
+			"href": "/api/technicians/3/",
+			"id": 3,
+			"name": "Cameron Jensen",
+			"employee_number": 3
+		},
+		{
+			"href": "/api/technicians/2/",
+			"id": 2,
+			"name": "Miracle Mechanic",
+			"employee_number": 2
+		}
+	]
+}
+```
+
+##### Without any technicians
+```json
+{
+    "technicians": []
+}
+```
+
+<br>
+
+### Create a technician
+---
+#### **Request**
+
+`POST /api/technicians/`
+
+    http://localhost:8080/api/technicians/
+
+```json
+{
+	"name": "Cameron Jensen",
+	"employee_number": 3
+}
+```
+
+<br>
+
+#### **Response**
+```yaml
+< HTTP/1.1 200 OK
+< Date: Mon, 12 Dec 2022 09:31:10 GMT
+< Server: WSGIServer/0.2 CPython/3.10.9
+< Content-Type: application/json
+< X-Frame-Options: DENY
+< Content-Length: 88
+< X-Content-Type-Options: nosniff
+< Referrer-Policy: same-origin
+< Cross-Origin-Opener-Policy: same-origin
+< Vary: Origin
+```
+
+```json
+{
+	"href": "/api/technicians/3/",
+	"id": 3,
+	"name": "Cameron Jensen",
+	"employee_number": 3
+}
+```
+
+<br>
+
+### Create a technician with invalid input
+---
+#### **Request**
+
+`POST /api/technicians/`
+
+    http://localhost:8080/api/technicians/
+
+```json
+{
+	"name": <200 char limit>,
+	"employee_number": <must not be an existing employee number>
+}
+```
+
+<br>
+
+#### **Response**
+```yaml
+< HTTP/1.1 400 Bad Request
+< Date: Mon, 12 Dec 2022 09:37:10 GMT
+< Server: WSGIServer/0.2 CPython/3.10.9
+< Content-Type: application/json
+< X-Frame-Options: DENY
+< Content-Length: 48
+< X-Content-Type-Options: nosniff
+< Referrer-Policy: same-origin
+< Cross-Origin-Opener-Policy: same-origin
+< Vary: Origin
+```
+
+```json
+{
+	"message": "Could not register the technician"
+}
+```
+
+<br>
+
+### Get the details of a technician
+---
+#### **Request**
+
+`GET /api/technicians/:id/`
+
+    http://localhost:8080/api/technicians/1/
+
+#### **Response**
+
+```yaml
+< HTTP/1.1 200 OK
+< Date: Mon, 12 Dec 2022 09:38:09 GMT
+< Server: WSGIServer/0.2 CPython/3.10.9
+< Content-Type: application/json
+< X-Frame-Options: DENY
+< Content-Length: 87
+< X-Content-Type-Options: nosniff
+< Referrer-Policy: same-origin
+< Cross-Origin-Opener-Policy: same-origin
+< Vary: Origin
+```
+```json
+{
+	"href": "/api/technicians/1/",
+	"id": 1,
+	"name": "Balor Rayhana",
+	"employee_number": 1
+}
+```
+
+<br>
+
+### Get the details of a technician that does not exist
+---
+#### **Request**
+
+`GET /api/technicians/:id/`
+
+    http://localhost:8080/api/technicians/999/
+
+#### **Response**
+
+```yaml
+< HTTP/1.1 400 Bad Request
+< Date: Mon, 12 Dec 2022 09:38:32 GMT
+< Server: WSGIServer/0.2 CPython/3.10.9
+< Content-Type: application/json
+< X-Frame-Options: DENY
+< Content-Length: 55
+< X-Content-Type-Options: nosniff
+< Referrer-Policy: same-origin
+< Cross-Origin-Opener-Policy: same-origin
+< Vary: Origin
+```
+```json
+{
+	"message": "Invalid technician employee ID provided."
+}
+```
+
+<br>
+
+### Modify the details of a technician
+---
+#### **Request**
+
+`PUT /api/technicians/:id/`
+
+    http://localhost:8080/api/technicians/1/
+
+```json
+{
+	"name": "Lénárd Eide",
+	"employee_number": 11
+}
+```
+#### **Response**
+```yaml
+< HTTP/1.1 200 OK
+< Date: Mon, 12 Dec 2022 09:39:16 GMT
+< Server: WSGIServer/0.2 CPython/3.10.9
+< Content-Type: application/json
+< X-Frame-Options: DENY
+< Content-Length: 96
+< X-Content-Type-Options: nosniff
+< Referrer-Policy: same-origin
+< Cross-Origin-Opener-Policy: same-origin
+< Vary: Origin
+```
+
+```json
+{
+	"href": "/api/technicians/1/",
+	"id": 1,
+	"name": "Lénárd Eide",
+	"employee_number": 11
+}
+```
+
+<br>
+
+### Modify the details of a technician that does not exist, or with invalid input
+---
+#### **Request**
+
+`PUT /api/technicians/:id/`
+
+    http://localhost:8080/api/technicians/1/
+
+```json
+{
+	"name": <200 char limit>,
+	"employee_number": <must not be an existing employee number>
+}
+```
+#### **Response**
+```yaml
+< HTTP/1.1 400 Bad Request
+< Date: Mon, 12 Dec 2022 09:40:11 GMT
+< Server: WSGIServer/0.2 CPython/3.10.9
+< Content-Type: application/json
+< X-Frame-Options: DENY
+< Content-Length: 71
+< X-Content-Type-Options: nosniff
+< Referrer-Policy: same-origin
+< Cross-Origin-Opener-Policy: same-origin
+< Vary: Origin
+```
+
+```json
+{
+	"message": "That Technician could not be found. "
+}
+```
+```json
+{
+	"message": "There is a technician with that employee number already."
+}
+```
+```json
+{
+	"message": "A value was specified that was longer than the allocated limit."
+}
+```
+
+<br>
+
+### Delete a technician
+---
+#### **Request**
+
+`DELETE /api/technicians/:id/`
+
+    http://localhost:8080/api/technicians/3/
+
+#### **Response**
+
+```yaml
+< HTTP/1.1 200 OK
+< Date: Mon, 12 Dec 2022 09:44:42 GMT
+< Server: WSGIServer/0.2 CPython/3.10.9
+< Content-Type: application/json
+< X-Frame-Options: DENY
+< Content-Length: 17
+< X-Content-Type-Options: nosniff
+< Referrer-Policy: same-origin
+< Cross-Origin-Opener-Policy: same-origin
+< Vary: Origin
+```
+
+```json
+{
+	"deleted": true
+}
+```
+
+<br>
+
+### Delete a deleted technician, or a technician that does not exist
+---
+#### **Request**
+
+`DELETE /api/technicians/:id/`
+
+    http://localhost:8080/api/technicians/999/
+
+#### **Response**
+
+```yaml
+< HTTP/1.1 200 OK
+< Date: Mon, 12 Dec 2022 09:45:07 GMT
+< Server: WSGIServer/0.2 CPython/3.10.9
+< Content-Type: application/json
+< X-Frame-Options: DENY
+< Content-Length: 18
+< X-Content-Type-Options: nosniff
+< Referrer-Policy: same-origin
+< Cross-Origin-Opener-Policy: same-origin
+< Vary: Origin
+```
+
+```json
+{
+	"deleted": false
+}
+```
+
+<br>
+
+### Delete a technician associated to an appointment
+---
+#### **Request**
+
+`DELETE /api/technicians/:id/`
+
+    http://localhost:8080/api/technicians/1/
+
+#### **Response**
+
+```yaml
+< HTTP/1.1 400 Bad Request
+< Date: Mon, 12 Dec 2022 09:46:01 GMT
+< Server: WSGIServer/0.2 CPython/3.10.9
+< Content-Type: application/json
+< X-Frame-Options: DENY
+< Content-Length: 49
+< X-Content-Type-Options: nosniff
+< Referrer-Policy: same-origin
+< Cross-Origin-Opener-Policy: same-origin
+< Vary: Origin
+```
+
+```json
+{
+	"message": "That technician cannot be deleted."
+}
+```
 
 <br>
 
@@ -785,386 +1163,6 @@ The REST API for the `service-api` microservice is detailed below.
 ```json
 {
 	"message": "Service appointment does not exist"
-}
-```
-
-<br>
-
-<br>
-
-### Get a list of technicians
----
-#### **Request**
-
-`GET /api/technicians/`
-
-    http://localhost:8080/api/technicians/
-
-#### **Response**
-
-```yaml
-< HTTP/1.1 200 OK
-< Date: Mon, 12 Dec 2022 09:31:12 GMT
-< Server: WSGIServer/0.2 CPython/3.10.9
-< Content-Type: application/json
-< X-Frame-Options: DENY
-< Content-Length: 288
-< X-Content-Type-Options: nosniff
-< Referrer-Policy: same-origin
-< Cross-Origin-Opener-Policy: same-origin
-< Vary: Origin
-```
-```json
-{
-	"technicians": [
-		{
-			"href": "/api/technicians/1/",
-			"id": 1,
-			"name": "Balor Rayhana",
-			"employee_number": 1
-		},
-		{
-			"href": "/api/technicians/3/",
-			"id": 3,
-			"name": "Cameron Jensen",
-			"employee_number": 3
-		},
-		{
-			"href": "/api/technicians/2/",
-			"id": 2,
-			"name": "Miracle Mechanic",
-			"employee_number": 2
-		}
-	]
-}
-```
-
-##### Without any technicians
-```json
-{
-    "technicians": []
-}
-```
-
-<br>
-
-### Create a technician
----
-#### **Request**
-
-`POST /api/technicians/`
-
-    http://localhost:8080/api/technicians/
-
-```json
-{
-	"name": "Cameron Jensen",
-	"employee_number": 3
-}
-```
-
-<br>
-
-#### **Response**
-```yaml
-< HTTP/1.1 200 OK
-< Date: Mon, 12 Dec 2022 09:31:10 GMT
-< Server: WSGIServer/0.2 CPython/3.10.9
-< Content-Type: application/json
-< X-Frame-Options: DENY
-< Content-Length: 88
-< X-Content-Type-Options: nosniff
-< Referrer-Policy: same-origin
-< Cross-Origin-Opener-Policy: same-origin
-< Vary: Origin
-```
-
-```json
-{
-	"href": "/api/technicians/3/",
-	"id": 3,
-	"name": "Cameron Jensen",
-	"employee_number": 3
-}
-```
-
-<br>
-
-### Create a technician with invalid input
----
-#### **Request**
-
-`POST /api/technicians/`
-
-    http://localhost:8080/api/technicians/
-
-```json
-{
-	"name": <200 char limit>,
-	"employee_number": <must not be an existing employee number>
-}
-```
-
-<br>
-
-#### **Response**
-```yaml
-< HTTP/1.1 400 Bad Request
-< Date: Mon, 12 Dec 2022 09:37:10 GMT
-< Server: WSGIServer/0.2 CPython/3.10.9
-< Content-Type: application/json
-< X-Frame-Options: DENY
-< Content-Length: 48
-< X-Content-Type-Options: nosniff
-< Referrer-Policy: same-origin
-< Cross-Origin-Opener-Policy: same-origin
-< Vary: Origin
-```
-
-```json
-{
-	"message": "Could not register the technician"
-}
-```
-
-<br>
-
-### Get the details of a technician
----
-#### **Request**
-
-`GET /api/technicians/:id/`
-
-    http://localhost:8080/api/technicians/1/
-
-#### **Response**
-
-```yaml
-< HTTP/1.1 200 OK
-< Date: Mon, 12 Dec 2022 09:38:09 GMT
-< Server: WSGIServer/0.2 CPython/3.10.9
-< Content-Type: application/json
-< X-Frame-Options: DENY
-< Content-Length: 87
-< X-Content-Type-Options: nosniff
-< Referrer-Policy: same-origin
-< Cross-Origin-Opener-Policy: same-origin
-< Vary: Origin
-```
-```json
-{
-	"href": "/api/technicians/1/",
-	"id": 1,
-	"name": "Balor Rayhana",
-	"employee_number": 1
-}
-```
-
-<br>
-
-### Get the details of a technician that does not exist
----
-#### **Request**
-
-`GET /api/technicians/:id/`
-
-    http://localhost:8080/api/technicians/999/
-
-#### **Response**
-
-```yaml
-< HTTP/1.1 400 Bad Request
-< Date: Mon, 12 Dec 2022 09:38:32 GMT
-< Server: WSGIServer/0.2 CPython/3.10.9
-< Content-Type: application/json
-< X-Frame-Options: DENY
-< Content-Length: 55
-< X-Content-Type-Options: nosniff
-< Referrer-Policy: same-origin
-< Cross-Origin-Opener-Policy: same-origin
-< Vary: Origin
-```
-```json
-{
-	"message": "Invalid technician employee ID provided."
-}
-```
-
-<br>
-
-### Modify the details of a technician
----
-#### **Request**
-
-`PUT /api/technicians/:id/`
-
-    http://localhost:8080/api/technicians/1/
-
-```json
-{
-	"name": "Lénárd Eide",
-	"employee_number": 11
-}
-```
-#### **Response**
-```yaml
-< HTTP/1.1 200 OK
-< Date: Mon, 12 Dec 2022 09:39:16 GMT
-< Server: WSGIServer/0.2 CPython/3.10.9
-< Content-Type: application/json
-< X-Frame-Options: DENY
-< Content-Length: 96
-< X-Content-Type-Options: nosniff
-< Referrer-Policy: same-origin
-< Cross-Origin-Opener-Policy: same-origin
-< Vary: Origin
-```
-
-```json
-{
-	"href": "/api/technicians/1/",
-	"id": 1,
-	"name": "Lénárd Eide",
-	"employee_number": 11
-}
-```
-
-<br>
-
-### Modify the details of a technician that does not exist, or with invalid input
----
-#### **Request**
-
-`PUT /api/technicians/:id/`
-
-    http://localhost:8080/api/technicians/1/
-
-```json
-{
-	"name": <200 char limit>,
-	"employee_number": <must not be an existing employee number>
-}
-```
-#### **Response**
-```yaml
-< HTTP/1.1 400 Bad Request
-< Date: Mon, 12 Dec 2022 09:40:11 GMT
-< Server: WSGIServer/0.2 CPython/3.10.9
-< Content-Type: application/json
-< X-Frame-Options: DENY
-< Content-Length: 71
-< X-Content-Type-Options: nosniff
-< Referrer-Policy: same-origin
-< Cross-Origin-Opener-Policy: same-origin
-< Vary: Origin
-```
-
-```json
-{
-	"message": "That Technician could not be found. "
-}
-```
-```json
-{
-	"message": "There is a technician with that employee number already."
-}
-```
-```json
-{
-	"message": "A value was specified that was longer than the allocated limit."
-}
-```
-
-<br>
-
-### Delete a technician
----
-#### **Request**
-
-`DELETE /api/technicians/:id/`
-
-    http://localhost:8080/api/technicians/3/
-
-#### **Response**
-
-```yaml
-< HTTP/1.1 200 OK
-< Date: Mon, 12 Dec 2022 09:44:42 GMT
-< Server: WSGIServer/0.2 CPython/3.10.9
-< Content-Type: application/json
-< X-Frame-Options: DENY
-< Content-Length: 17
-< X-Content-Type-Options: nosniff
-< Referrer-Policy: same-origin
-< Cross-Origin-Opener-Policy: same-origin
-< Vary: Origin
-```
-
-```json
-{
-	"deleted": true
-}
-```
-
-<br>
-
-### Delete a deleted technician, or a technician that does not exist
----
-#### **Request**
-
-`DELETE /api/technicians/:id/`
-
-    http://localhost:8080/api/technicians/999/
-
-#### **Response**
-
-```yaml
-< HTTP/1.1 200 OK
-< Date: Mon, 12 Dec 2022 09:45:07 GMT
-< Server: WSGIServer/0.2 CPython/3.10.9
-< Content-Type: application/json
-< X-Frame-Options: DENY
-< Content-Length: 18
-< X-Content-Type-Options: nosniff
-< Referrer-Policy: same-origin
-< Cross-Origin-Opener-Policy: same-origin
-< Vary: Origin
-```
-
-```json
-{
-	"deleted": false
-}
-```
-
-<br>
-
-### Delete a technician associated to an appointment
----
-#### **Request**
-
-`DELETE /api/technicians/:id/`
-
-    http://localhost:8080/api/technicians/1/
-
-#### **Response**
-
-```yaml
-< HTTP/1.1 400 Bad Request
-< Date: Mon, 12 Dec 2022 09:46:01 GMT
-< Server: WSGIServer/0.2 CPython/3.10.9
-< Content-Type: application/json
-< X-Frame-Options: DENY
-< Content-Length: 49
-< X-Content-Type-Options: nosniff
-< Referrer-Policy: same-origin
-< Cross-Origin-Opener-Policy: same-origin
-< Vary: Origin
-```
-
-```json
-{
-	"message": "That technician cannot be deleted."
 }
 ```
 
