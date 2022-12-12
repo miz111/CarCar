@@ -17,7 +17,7 @@ Team:
   - [Need to reset your PostgreSQL database?](#need-to-reset-your-postgresql-database)
   - [Design](#design)
   - [Service microservice](#service-microservice)
-    - [Models](#service-api-models)
+    - [Service API Models](#service-api-models)
     - [RESTful Service API](#restful-service-api)
       - [Get a list of appointments](#get-a-list-of-appointments)
       - [Create an appointment](#create-an-appointment)
@@ -42,40 +42,41 @@ Team:
       - [Delete a deleted technician, or a technician that does not exist](#delete-a-deleted-technician-or-a-technician-that-does-not-exist)
       - [Delete a technician associated to an appointment](#delete-a-technician-associated-to-an-appointment)
   - [Sales Microservice](#sales-microservice)
+    - [Sales API Models](#sales--api-models)
     - [RESTful Sales API](#restful-sales-api)
-    - [Get a list of all sales persons](#get-a-list-of-all-sales-persons)
-    - [Get details on a sales person](#get-details-on-a-sales-person)
-    - [Create a sales person](#create-a-sales-person)
-    - [Edit a sales person](#edit-a-sales-person)
-    - [Delete a sales person](#delete-a-sales-person)
-    - [Get a list of all customers](#get-a-list-of-all-customers)
-    - [Get details on a Customer](#get-details-on-a-customer)
-    - [Edit a customer](#edit-a-customer)
-    - [Delete a customer](#delete-a-customer)
-    - [Get a list of all sales records](#get-a-list-of-all-sales-records)
-    - [Get sales records filtered by sales person](#get-sales-records-filtered-by-sales-person)
-    - [Get details on a Sales Record](#get-details-on-a-sales-record)
-    - [Create a sales record](#create-a-sales-record)
-    - [Edit a sales record](#edit-a-sales-record)
-  - [Models](#models)
+      - [Get a list of all sales persons](#get-a-list-of-all-sales-persons)
+      - [Get details on a sales person](#get-details-on-a-sales-person)
+      - [Create a sales person](#create-a-sales-person)
+      - [Edit a sales person](#edit-a-sales-person)
+      - [Delete a sales person](#delete-a-sales-person)
+      - [Get a list of all customers](#get-a-list-of-all-customers)
+      - [Get details on a Customer](#get-details-on-a-customer)
+      - [Edit a customer](#edit-a-customer)
+      - [Delete a customer](#delete-a-customer)
+      - [Get a list of all sales records](#get-a-list-of-all-sales-records)
+      - [Get sales records filtered by sales person](#get-sales-records-filtered-by-sales-person)
+      - [Get details on a Sales Record](#get-details-on-a-sales-record)
+      - [Create a sales record](#create-a-sales-record)
+      - [Edit a sales record](#edit-a-sales-record)
   - [Inventory Microservice](#inventory-microservice)
+    - [Inventory API Models](#inventory-api-models)
     - [RESTful Inventory API](#restful-inventory-api)
-    - [Get a list of all manufacturers](#get-a-list-of-all-manufacturers)
-    - [Get details on a manufacturer](#get-details-on-a-manufacturer)
-    - [Create a Manufacturer](#create-a-manufacturer)
-    - [Edit a manufacturer](#edit-a-manufacturer)
-    - [Delete a manufacturer](#delete-a-manufacturer)
-    - [Get a list of all vehicle models](#get-a-list-of-all-vehicle-models)
-    - [Get details on a vehicle model](#get-details-on-a-vehicle-model)
-    - [Create a Vehicle Model](#create-a-vehicle-model)
-    - [Edit a vehicle model](#edit-a-vehicle-model)
-    - [Delete a vehicle model](#delete-a-vehicle-model)
-    - [Get a list of all automobiles](#get-a-list-of-all-automobiles)
-    - [Get details on an automobile](#get-details-on-an-automobile)
-    - [Create an automobile](#create-an-automobile)
-    - [Edit an automobile](#edit-an-automobile)
-    - [Delete an automobile](#delete-an-automobile)
-  - [Models](#models-1)
+      - [Get a list of all manufacturers](#get-a-list-of-all-manufacturers)
+      - [Get details on a manufacturer](#get-details-on-a-manufacturer)
+      - [Create a Manufacturer](#create-a-manufacturer)
+      - [Edit a manufacturer](#edit-a-manufacturer)
+      - [Delete a manufacturer](#delete-a-manufacturer)
+      - [Get a list of all vehicle models](#get-a-list-of-all-vehicle-models)
+      - [Get details on a vehicle model](#get-details-on-a-vehicle-model)
+      - [Create a Vehicle Model](#create-a-vehicle-model)
+      - [Edit a vehicle model](#edit-a-vehicle-model)
+      - [Delete a vehicle model](#delete-a-vehicle-model)
+      - [Get a list of all automobiles](#get-a-list-of-all-automobiles)
+      - [Get details on an automobile](#get-details-on-an-automobile)
+      - [Create an automobile](#create-an-automobile)
+      - [Edit an automobile](#edit-an-automobile)
+      - [Delete an automobile](#delete-an-automobile)
+
 
 <br>
 <br>
@@ -1178,6 +1179,42 @@ In addition to a list view of sales persons, customers, and sales records, users
 
 <br>
 
+### Sales API Models
+---
+ **AutomobileVO**
+#### The AutomobileVO object is based off of the Automobile model from the inventory microservice.
+| Attribute   |  Type   |           Options           |                 Description                 |
+| ----------- | :-----: | :-------------------------: | :-----------------------------------------: |
+| color       | string  |        max. 50 chars        |         the color of the automobile         |
+| year        | integer |                             |    the year aumotobile was manufactured     |
+| vin         | string  | max. 17 chars, unique=True  |            unique automobile vin            |
+| import_href | string  | max. 200 chars, unique=True |     unique identifier used for polling      |
+| model_name  | string  |       max. 100 chars        |      the name of the automobile model       |
+| is_sold     | boolean |        default=False        | whether the automobile has been sold or not |
+
+ **Sales Person**
+
+| Attribute       |  Type   |    Options     |                Description                |
+| --------------- | :-----: | :------------: | :---------------------------------------: |
+| name            | string  | max. 200 chars |       the name of the sales person        |
+| employee_number | integer |  unique=True   | the sales person's unique employee number |
+
+ **Customer**
+
+| Attribute    |  Type  |          Options           |           Description            |
+| ------------ | :----: | :------------------------: | :------------------------------: |
+| name         | string |       max. 200 chars       |     the name of the customer     |
+| address      | string |       max. 200 chars       |   the address of the customer    |
+| phone_number | string | max. 20 chars, unique=True | the phone number of the customer |
+
+The attributes in each model are used to describe or identify an object. The options are the limitations for the value of the objects. For instance, it is not possible to input a string for the year of an automobile because it has been specified to be an integer field. Foreign keys have significance as they describe the dependancy between the model object and the attribute. Specifically for sales records, any automobile, sales_person, or customer that has a sales record will be protected because it is not possible to delete a sales record.
+
+**Value Objects**
+
+Customers, sales persons, and sales records are their own entities, while the attributes that describe them are value objects. They are intrinsic for describing an entity, so they are implemented as an attribute. Note that in the model for sales record, each automobile, sales_person, and customer is acting as a value obejct that describes the sales record.
+
+<br>
+
 ### RESTful Sales API
 ---
 The REST API for the `sales-api` microservice is detailed below.
@@ -1977,50 +2014,6 @@ The REST API for the `sales-api` microservice is detailed below.
 ```
 
 <br>
-
-## Models
- **AutomobileVO**
-#### The AutomobileVO object is based off of the Automobile model from the inventory microservice.
-| Attribute   |  Type   |           Options           |
-| ----------- | :-----: | :-------------------------: |
-| color       | string  |        max. 50 chars        |
-| year        | integer |      positive smallint      |
-| vin         | string  | max. 17 chars, unique=True  |
-| import_href | string  | max. 200 chars, unique=True |
-| model_name  | string  |       max. 100 chars        |
-| is_sold     | boolean |        default=False        |
-
- **Sales Person**
-
-| Attribute       |  Type   |            Options             |
-| --------------- | :-----: | :----------------------------: |
-| name            | string  |         max. 200 chars         |
-| employee_number | integer | positive smallint, unique=True |
-
- **Customer**
-
-| Attribute    |  Type  |          Options           |
-| ------------ | :----: | :------------------------: |
-| name         | string |       max. 200 chars       |
-| address      | string |       max. 200 chars       |
-| phone_number | string | max. 20 chars, unique=True |
-
- **Sales Record**
-
-| Attribute    |        Type        |             Options              |
-| ------------ | :----------------: | :------------------------------: |
-| price        |       float        | max. 10 chars, max 2 dec. places |
-| automobile   | foreign key object |        on_delete=PROTECT         |
-| sales_person | foreign key object |        on_delete=PROTECT         |
-| customer     | foreign key object |        on_delete=PROTECT         |
-
-The attributes in each model are used to describe or identify an object. The options are the limitations for the value of the objects. For instance, it is not possible to input a string for the year of an automobile because it has been specified to be an integer field. Foreign keys have significance as they describe the dependancy between the model object and the attribute. Specifically for sales records, any automobile, sales_person, or customer that has a sales record will be protected because it is not possible to delete a sales record.
-
-**Value Objects**
-
-Customers, sales persons, and sales records are their own entities, while the attributes that describe them are value objects. They are intrinsic for describing an entity, so they are implemented as an attribute. Note that in the model for sales record, each automobile, sales_person, and customer is acting as a value obejct that describes the sales record.
-
-<br>
 <br>
 
 ## Inventory Microservice
@@ -2030,6 +2023,42 @@ The inventory microservice ultimately keeps track of automobiles (with their cor
 Changes made to the `Automobile` model (such as whether the automobile was sold) are updated on associated microservices (`sales-api` and `service-api`) via **polling**.
 
 Deletion of any instances of `Manufacturer` causes a cascade deletion of related `Vehicle` instances, which subsequently causes another cascade deletion of related `Automobile` instances. Value objects already generated on associated microservices will remain unaffected by deletions performed on the `inventory-api`.
+
+<br>
+
+## Inventory API Models
+
+<br>
+
+ **Manufacturer**
+| Attribute |  Type  |           Options           | Description                  |
+| --------- | :----: | :-------------------------: | ---------------------------- |
+| name      | string | max. 100 chars, unique=True | The name of the manufacturer |
+
+<br>
+
+
+ **VehicleModel**
+| Attribute    |       Type        |      Options      | Description                             |
+| ------------ | :---------------: | :---------------: | --------------------------------------- |
+| name         |      string       |  max. 100 chars   | The name of the vehicle model           |
+| picture_url  |      string       |        url        | URL for a picture for the vehicle model |
+| manufacturer | ForeignKey object | on_delete=CASCADE | The manufacturer of the vehicle model   |
+
+<br>
+
+ **Automobile**
+| Attribute |       Type        |          Options           | Description                                  |
+| --------- | :---------------: | :------------------------: | -------------------------------------------- |
+| color     |      string       |       max. 50 chars        | The color of the automobile                  |
+| year      |        int        |     positive smallint      | The year of the vehicle model                |
+| vin       |      string       | max. 17 chars, unique=True | The VIN number registered for the automobile |
+| is_sold   |      boolean      |       default=False        | Whether the automobile has been sold or not  |
+| model     | ForeignKey object |     on_delete=CASCADE      | The vehicle model of the automobile          |
+
+<br>
+
+The attributes in each model are used to describe or identify an object. The options are the limitations for the value of the objects. For instance, each VIN must be unique and can be used as an automobile identifier. This makes sense because when you register an automobile (with, for example, DMV), no two autombiles will be assigned the same VIN. Foreign keys have significance as they describe the dependancy between the model object and the attribute. Manufacturer serves as a foriegn key value object to vehicle models, and vehicle models serve as the foreign key for automobiles. When a manufacturer is deleted, all vehicle models made by that manufacturer will also be deleted. And when a vehicle model is deleted, all automobiles affiliated with that vehicle model will be removed from the database as well. Please note that these changes do not affect the sales and service microservices database. Through polling, each microservice creates a duplicate copy of automobiles for their own database, so making changes in the inventory microservices database will not create any changes for the sales or service microservice.
 
 <br>
 
@@ -2791,39 +2820,3 @@ The REST API for the `inventory-api` microservice is detailed below.
 	"is_sold": false
 }
 ```
-
-<br>
-
-## Models
-
-<br>
-
- **Manufacturer**
-| Attribute |  Type  |           Options           | Description                  |
-| --------- | :----: | :-------------------------: | ---------------------------- |
-| name      | string | max. 100 chars, unique=True | The name of the manufacturer |
-
-<br>
-
-
- **VehicleModel**
-| Attribute    |       Type        |      Options      | Description                             |
-| ------------ | :---------------: | :---------------: | --------------------------------------- |
-| name         |      string       |  max. 100 chars   | The name of the vehicle model           |
-| picture_url  |      string       |        url        | URL for a picture for the vehicle model |
-| manufacturer | ForeignKey object | on_delete=CASCADE | The manufacturer of the vehicle model   |
-
-<br>
-
- **Automobile**
-| Attribute |       Type        |          Options           | Description                                  |
-| --------- | :---------------: | :------------------------: | -------------------------------------------- |
-| color     |      string       |       max. 50 chars        | The color of the automobile                  |
-| year      |        int        |     positive smallint      | The year of the vehicle model                |
-| vin       |      string       | max. 17 chars, unique=True | The VIN number registered for the automobile |
-| is_sold   |      boolean      |       default=False        | Whether the automobile has been sold or not  |
-| model     | ForeignKey object |     on_delete=CASCADE      | The vehicle model of the automobile          |
-
-<br>
-
-The attributes in each model are used to describe or identify an object. The options are the limitations for the value of the objects. For instance, each VIN must be unique and can be used as an automobile identifier. This makes sense because when you register an automobile (with, for example, DMV), no two autombiles will be assigned the same VIN. Foreign keys have significance as they describe the dependancy between the model object and the attribute. Manufacturer serves as a foriegn key value object to vehicle models, and vehicle models serve as the foreign key for automobiles. When a manufacturer is deleted, all vehicle models made by that manufacturer will also be deleted. And when a vehicle model is deleted, all automobiles affiliated with that vehicle model will be removed from the database as well. Please note that these changes do not affect the sales and service microservices database. Through polling, each microservice creates a duplicate copy of automobiles for their own database, so making changes in the inventory microservices database will not create any changes for the sales or service microservice.
