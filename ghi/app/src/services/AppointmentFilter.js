@@ -8,16 +8,27 @@ class AppointmentFilter extends React.Component {
       searchVIN: "",
       service_appointments: [],
       service_appointments_copy: [],
+      noMatch: false,
     };
     this.handleSearchChange = this.handleSearchChange.bind(this);
   }
 
   handleSearchChange(e) {
-    this.setState({ [e.target.id]: e.target.value.toUpperCase() });
-    this.setState({
-      service_appointments_copy: this.state.service_appointments.filter((x) =>
-        x.vin.includes(e.target.value.toUpperCase())
-      ),
+    this.setState({ searchVIN: e.target.value.toUpperCase() }, () => {
+      this.setState(
+        {
+          service_appointments_copy: this.state.service_appointments.filter(
+            (x) => x.vin.includes(this.state.searchVIN)
+          ),
+        },
+        () => {
+          if (this.state.service_appointments_copy.length === 0) {
+            this.setState({ noMatch: true });
+          } else {
+            this.setState({ noMatch: false });
+          }
+        }
+      );
     });
   }
 
@@ -53,16 +64,23 @@ class AppointmentFilter extends React.Component {
   }
 
   render() {
+    let noMatchClasses = "d-none";
+    let hideTableClasses = "table table-striped table-hover text-center";
+    if (this.state.noMatch) {
+      noMatchClasses = "mt-5 container alert alert-danger mb-0";
+      hideTableClasses = "d-none";
+    }
+
     return (
       <div className="container mt-5">
-        <div className="">
+        <div>
           <div className="input-group mb-3">
             <input
               type="text"
               className="form-control"
               placeholder="Search using VIN"
               aria-label="VIN number"
-              aria-describedby="basic-addon2"
+              aria-describedby="searchvin-input"
               id="searchVIN"
               maxLength="17"
               value={this.state.searchVIN}
@@ -71,7 +89,7 @@ class AppointmentFilter extends React.Component {
             <button
               type="button"
               className="input-group-text"
-              id="basic-addon2"
+              id="searchvin-input"
               value={this.state.searchVIN}
               onClick={this.handleSearchChange}
             >
@@ -85,7 +103,7 @@ class AppointmentFilter extends React.Component {
             ↩ Return to appointment list
           </button>
         </Link>
-        <table className="table table-striped table-hover text-center">
+        <table className={hideTableClasses}>
           <thead>
             <tr>
               <th style={{ width: "0px" }}>VIN</th>
@@ -119,6 +137,9 @@ class AppointmentFilter extends React.Component {
             })}
           </tbody>
         </table>
+        <div className={noMatchClasses}>
+          There are no appointments that match the VIN you provided...
+        </div>
       </div>
     );
   }

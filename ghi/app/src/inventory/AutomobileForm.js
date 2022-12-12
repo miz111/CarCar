@@ -18,11 +18,12 @@ class AutomobileForm extends React.Component {
 
   async handleSubmit(event) {
     event.preventDefault();
-    const data = { ...this.state };
-    delete data.models;
-    delete data.success;
-    delete data.failedAttempt;
-
+    const data = {
+      color: this.state.color,
+      year: this.state.year,
+      vin: this.state.vin,
+      model_id: this.state.model_id,
+    };
     const automobilesUrl = `http://localhost:8100/api/automobiles/`;
     const fetchConfig = {
       method: "post",
@@ -147,11 +148,15 @@ class AutomobileForm extends React.Component {
               <button className="btn btn-primary">Create</button>
             </form>
           </div>
-          <div className={addedAutomobilesClasses} id="added-automobile-message">
+          <div
+            className={addedAutomobilesClasses}
+            id="added-automobile-message"
+          >
             The automobile has been added.
           </div>
           <div className={failedAttemptClasses} id="failed-attempt-message">
-            Failed to add the automobile... it is possible that there is already a similar VIN number in the system...
+            Failed to add the automobile... it is possible that there is already
+            a similar VIN number in the system...
           </div>
         </div>
       </div>

@@ -4,6 +4,7 @@ import Nav from "./Nav";
 import ManufacturerList from "./inventory/ManufacturerList";
 import ManufacturerForm from "./inventory/ManufacturerForm";
 import VehicleList from "./inventory/VehicleList";
+import VehicleListPictures from "./inventory/VehicleListPicture";
 import VehicleForm from "./inventory/VehicleForm";
 import AutomobileList from "./inventory/AutomobileList";
 import AutomobileForm from "./inventory/AutomobileForm";
@@ -36,6 +37,7 @@ function App() {
           <Route path="vehicles">
             <Route index element={<VehicleList />} />
             <Route path="new" element={<VehicleForm />} />
+            <Route path="picture-view" element={<VehicleListPictures />} />
           </Route>
           <Route path="automobiles">
             <Route index element={<AutomobileList />} />

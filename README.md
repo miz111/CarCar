@@ -1,6 +1,6 @@
 # **CarCar**
 
-A Python/Django-based web app with a JS/React-integrated front-end that provides a solution to tracking inventory, sales, and service for a car dealership.
+A Python/Django-based web app utilizing a REST framework with a JS/React-integrated front-end and PostgreSQL database that provides a solution to tracking vehicle and automobile inventory, sales, and services for a car dealership.
 
 ---
 Team:
@@ -8,10 +8,39 @@ Team:
 * **Person 1:** Martey (Service)
 * **Person 2:** Jess (Sales)
 
+<br>
+
+# Table of Contents
+
 - [**CarCar**](#carcar)
   - [Setup Guide](#setup-guide)
   - [Need to reset your PostgreSQL database?](#need-to-reset-your-postgresql-database)
   - [Design](#design)
+  - [Service microservice](#service-microservice)
+    - [Models](#service-api-models)
+    - [RESTful Service API](#restful-service-api)
+      - [Get a list of appointments](#get-a-list-of-appointments)
+      - [Create an appointment](#create-an-appointment)
+      - [Create an appointment with invalid input](#create-an-appointment-with-invalid-input)
+      - [Get the details of an appointment](#get-the-details-of-an-appointment)
+      - [Get the details of an appointment that does not exist](#get-the-details-of-an-appointment-that-does-not-exist)
+      - [Modify the details of an appointment](#modify-the-details-of-an-appointment)
+      - [Modify the details of an appointment that does not exist, or with invalid input](#modify-the-details-of-an-appointment-that-does-not-exist-or-with-invalid-input)
+      - [Delete an appointment](#delete-an-appointment)
+      - [Delete a deleted appointment, or an appointment that does not exist](#delete-a-deleted-appointment-or-an-appointment-that-does-not-exist)
+      - [Mark an appointment as finished](#mark-an-appointment-as-finished)
+      - [Mark an appointment as finished for an appointment that does not exist](#mark-an-appointment-as-finished-for-an-appointment-that-does-not-exist)
+      - ---
+      - [Get a list of technicians](#get-a-list-of-technicians)
+      - [Create a technician](#create-a-technician)
+      - [Create a technician with invalid input](#create-a-technician-with-invalid-input)
+      - [Get the details of a technician](#get-the-details-of-a-technician)
+      - [Get the details of a technician that does not exist](#get-the-details-of-a-technician-that-does-not-exist)
+      - [Modify the details of a technician](#modify-the-details-of-a-technician)
+      - [Modify the details of a technician that does not exist, or with invalid input](#modify-the-details-of-a-technician-that-does-not-exist-or-with-invalid-input)
+      - [Delete a technician](#delete-a-technician)
+      - [Delete a deleted technician, or a technician that does not exist](#delete-a-deleted-technician-or-a-technician-that-does-not-exist)
+      - [Delete a technician associated to an appointment](#delete-a-technician-associated-to-an-appointment)
   - [Sales Microservice](#sales-microservice)
     - [RESTful Sales API](#restful-sales-api)
     - [Get a list of all sales persons](#get-a-list-of-all-sales-persons)
@@ -47,6 +76,9 @@ Team:
     - [Edit an automobile](#edit-an-automobile)
     - [Delete an automobile](#delete-an-automobile)
   - [Models](#models-1)
+
+<br>
+<br>
 
 ## Setup Guide
 ---
@@ -90,6 +122,9 @@ docker-compose up
 
 ### 7. Congratulations, your CarCar web app is ready and accessible by visiting http://localhost:3000/
 
+<br>
+<br>
+
 ## Need to reset your PostgreSQL database?
 ---
 
@@ -111,8 +146,13 @@ docker-compose up
 
     docker-compose up
 
+<br>
+<br>
+
 ## Design
 ---
+
+![carcar-simple-diagram](/img/carcar-simple-diagram.png)
 
 - front-end: http://localhost:3000/
 
@@ -121,15 +161,1029 @@ docker-compose up
 - service-api: http://localhost:8080/
 
 - sales-api: http://localhost:8090/
+
+<br>
+<br>
+
+## Service microservice
+---
+The `service-api` is a `RESTful` microservice which manages automobile service appointments as well as hired technician employees who are assigned to handle each service appointment.
+
+In this design, automobiles from other dealerships are very welcome to have their automobiles serviced in this dealership; however, automobiles that were once in the inventory of this dealership receive a special VIP treatment.
+
+This microservice utilizes its integration with the `inventory-api` in order for the `service-api` to determine whether the automobile scheduled for the appointment was once in this dealership's inventory. To accomplish this feature, an immutable copy of all automobiles from the `inventory-api` are created/updated and stored as **`automobile value objects`** (`AutomobileVO`) through the use of periodic **`polling`**. Whenever an appointment is created, the `service-api` checks whether the VIN number provided by the customer matches any VIN number that is in the system (i.e. `AutomobileVO` with a matching VIN property), and if it does find a match, then the appointment will be flagged for VIP servicing (i.e. `vip_treatment: True`).
+
+Given that `vin` and `import_href` properties are unique for each `Automobile` in the `inventory-api`, the `AutomobileVO` model uses these properties to establish a link between the `AutomobileVO` and the `Automobile` model in the `inventory-api`. Although other properties such as `year`, `color`, and the associated vehicle model's name (`model_name`) are not currently utilized, they are populated into the `AutomobileVO` database for potential future use.
+
+Because each service appointment requires a designated technician, and each technician can be assigned to many appointments, the `ServiceAppointment` model establishes a many-to-one relationship with the `Technician` model via a Foreign Key. Since it is desirable to keep a record of all service appointments that transpire, the Foreign Key utilizes the on_delete PROTECT option, which prevents any associated service appointments from being deleted when a technician instance gets deleted.
+
+A breakdown of features that this microservice carries includes:
+- Adding a technician
+- Modifying existing technicians
+- Deleting technicians (that have not been associated with any appointments)
+- Creating a service appointment
+- Deleting/Canceling a service appointment
+- Marking a service appointment as finished
+
+<br>
+
+The models are described below.
+
+<br>
+
+## Service API Models
+---
+**Technician**
+
+| Attribute       |  Type  |    Options     | Description                       |
+| --------------- | :----: | :------------: | --------------------------------- |
+| name            | string | max. 200 chars | The technician's name             |
+| employee_number |  int   |     unique     | A unique assigned employee number |
+
+<br>
+
+**ServiceAppointment**
+
+| Attribute     |       Type        |      Options      | Description                                     |
+| ------------- | :---------------: | :---------------: | ----------------------------------------------- |
+| vin           |      string       |  max. 200 chars   | The VIN number of the automobile to be serviced |
+| customer_name |      string       |  max. 200 chars   | The customer's name                             |
+| date_time     |     datetime      |                   | The date and time of the service appointment    |
+| technician    | ForeignKey object | on_delete=PROTECT | The assigned technician                         |
+| reason        |      string       |  max. 200 chars   | The reason for having the automobile serviced   |
+| vip_treatment |      boolean      |   default=False   | Whether the appointment exercises VIP treatment |
+| is_finished   |      boolean      |   default=False   | Whether the appointment has transpired or not   |
+
+<br>
+
+**AutomobileVO**
+
+| Attribute   |       Type        |        Options        | Description                                                                 |
+| ----------- | :---------------: | :-------------------: | --------------------------------------------------------------------------- |
+| import_href |      string       |    max. 200 chars     | Href pointing towards the associated Automobile object in the inventory-api |
+| color       |      string       |     max. 50 chars     | The color of the automobile                                                 |
+| year        |        int        |       smallint        | The year of the automobile's model                                          |
+| vin         | ForeignKey object | max. 17 chars, unique | The automobile's VIN number                                                 |
+| model_name  |      string       |    max. 100 chars     | The automobile's model name                                                 |
+
+<br>
+<br>
+
+### RESTful Service API
+---
+The REST API for the `service-api` microservice is detailed below.
+
+<br>
+
+#### **Service appointments**
+
+| Method | URL                           | What it does                         |
+| ------ | :---------------------------- | :----------------------------------- |
+| GET    | /api/appointments/            | Get a list of appointments           |
+| POST   | /api/appointments/            | Create an appointment                |
+| GET    | /api/appointments/:id/        | Get the details of an appointment    |
+| PUT    | /api/appointments/:id/        | Modify the details of an appointment |
+| DELETE | /api/appointments/:id/        | Delete an appointment                |
+| PUT    | /api/appointments/:id/finish/ | Mark an appointment as finished      |
+
+<br>
+
+#### **Technicians**
+
+| Method | URL                   | What it does                       |
+| ------ | :-------------------- | :--------------------------------- |
+| GET    | /api/technicians/     | Get a list of technicians          |
+| POST   | /api/technicians/     | Create a technician                |
+| GET    | /api/technicians/:id/ | Get the details of a technician    |
+| PUT    | /api/technicians/:id/ | Modify the details of a technician |
+| DELETE | /api/technicians/:id/ | Delete a technician                |
+
+<br>
+
+### Get a list of appointments
+---
+#### **Request**
+
+`GET /api/appointments/`
+
+    http://localhost:8080/api/appointments/
+
+#### **Response**
+
+```yaml
+< HTTP/1.1 200 OK
+< Date: Mon, 12 Dec 2022 08:47:22 GMT
+< Server: WSGIServer/0.2 CPython/3.10.9
+< Content-Type: application/json
+< X-Frame-Options: DENY
+< Content-Length: 1329
+< X-Content-Type-Options: nosniff
+< Referrer-Policy: same-origin
+< Cross-Origin-Opener-Policy: same-origin
+< Vary: Origin
+```
+```json
+{
+	"service_appointments": [
+		{
+			"href": "/api/appointments/1/",
+			"id": 1,
+			"vin": "5NPE34AFXFH053565",
+			"customer_name": "Branislava Kieran",
+			"date_time": "2022-12-10T07:00:00+00:00",
+			"technician": {
+				"href": "/api/technicians/1/",
+				"id": 1,
+				"name": "Balor Rayhana",
+				"employee_number": 1
+			},
+			"reason": "Oil change",
+			"vip_treatment": true,
+			"is_finished": true
+		},
+		{
+			"href": "/api/appointments/2/",
+			"id": 2,
+			"vin": "3FADP4EJ9EM237120",
+			"customer_name": "Sitaram Godelieve",
+			"date_time": "2022-12-11T07:00:00+00:00",
+			"technician": {
+				"href": "/api/technicians/1/",
+				"id": 1,
+				"name": "Balor Rayhana",
+				"employee_number": 1
+			},
+			"reason": "Tire rotation",
+			"vip_treatment": false,
+			"is_finished": true
+		},
+		{
+			"href": "/api/appointments/3/",
+			"id": 3,
+			"vin": "SAJAV1345GC463918",
+			"customer_name": "Law Ghufran",
+			"date_time": "2022-12-13T09:45:00+00:00",
+			"technician": {
+				"href": "/api/technicians/1/",
+				"id": 1,
+				"name": "Balor Rayhana",
+				"employee_number": 1
+			},
+			"reason": "Tire rotation",
+			"vip_treatment": false,
+			"is_finished": false
+		},
+		{
+			"href": "/api/appointments/4/",
+			"id": 4,
+			"vin": "JM1BL1VF6B1466144",
+			"customer_name": "Derrick Stanley",
+			"date_time": "2022-12-23T16:00:00+00:00",
+			"technician": {
+				"href": "/api/technicians/1/",
+				"id": 1,
+				"name": "Balor Rayhana",
+				"employee_number": 1
+			},
+			"reason": "Car battery replacement",
+			"vip_treatment": false,
+			"is_finished": true
+		}
+	]
+}
+```
+
+##### Without any appointments
+```json
+{
+    "service_appointments": []
+}
+```
+
+<br>
+
+### Create an appointment
+---
+#### **Request**
+
+`POST /api/appointments/`
+
+    http://localhost:8080/api/appointments/
+
+```json
+{
+	"vin": "1C3CC5FB2AN120175",
+	"customer_name": "John Doe",
+	"date_time": "2022-12-06 09:00",
+	"technician": 1,
+	"reason": "A reason"
+}
+```
+##### *employee number is specified for the technician property
+
+<br>
+
+#### **Response**
+```yaml
+< HTTP/1.1 200 OK
+< Date: Thu, 08 Dec 2022 09:17:31 GMT
+< Server: WSGIServer/0.2 CPython/3.10.8
+< Content-Type: application/json
+< X-Frame-Options: DENY
+< Content-Length: 299
+< X-Content-Type-Options: nosniff
+< Referrer-Policy: same-origin
+< Cross-Origin-Opener-Policy: same-origin
+< Vary: Origin
+```
+
+```json
+{
+	"href": "/api/appointments/10/",
+	"id": 10,
+	"vin": "1C3CC5FB2AN120175",
+	"customer_name": "John Doe",
+	"date_time": "2022-12-06 09:00",
+	"technician": {
+		"href": "/api/technicians/1/",
+		"id": 1,
+		"name": "John Doe",
+		"employee_number": 1
+	},
+	"reason": "A reason",
+	"vip_treatment": false,
+	"is_finished": false
+}
+```
+
+<br>
+
+### Create an appointment with invalid input
+---
+#### **Request**
+
+`POST /api/appointments/`
+
+    http://localhost:8080/api/appointments/
+
+```json
+{
+	"vin": <17 char limit>,
+	"customer_name": <200 char limit>,
+	"date_time": <non-datetime format>,
+	"technician": <invalid employee_number>,
+	"reason": <200 char limit>
+}
+```
+##### *employee number is specified for the technician property
+
+<br>
+
+#### **Response**
+```yaml
+< HTTP/1.1 400 Bad Request
+< Date: Mon, 12 Dec 2022 09:07:20 GMT
+< Server: WSGIServer/0.2 CPython/3.10.9
+< Content-Type: application/json
+< X-Frame-Options: DENY
+< Content-Length: 78
+< X-Content-Type-Options: nosniff
+< Referrer-Policy: same-origin
+< Cross-Origin-Opener-Policy: same-origin
+< Vary: Origin
+```
+
+```json
+{
+	"message": "A value was specified that was longer than the allocated limit."
+}
+```
+
+```json
+{
+	"message": "Invalid Technician employee number provided."
+}
+```
+
+```json
+{
+	"message": "A value was specified with an invalid format."
+}
+```
+
+<br>
+
+### Get the details of an appointment
+---
+#### **Request**
+
+`GET /api/appointments/:id/`
+
+    http://localhost:8080/api/appointments/1/
+
+#### **Response**
+
+```yaml
+< HTTP/1.1 200 OK
+< Date: Mon, 12 Dec 2022 08:46:17 GMT
+< Server: WSGIServer/0.2 CPython/3.10.9
+< Content-Type: application/json
+< X-Frame-Options: DENY
+< Content-Length: 320
+< X-Content-Type-Options: nosniff
+< Referrer-Policy: same-origin
+< Cross-Origin-Opener-Policy: same-origin
+< Vary: Origin
+```
+```json
+{
+	"href": "/api/appointments/1/",
+	"id": 1,
+	"vin": "5NPE34AFXFH053565",
+	"customer_name": "Branislava Kieran",
+	"date_time": "2022-12-10T07:00:00+00:00",
+	"technician": {
+		"href": "/api/technicians/1/",
+		"id": 1,
+		"name": "Balor Rayhana",
+		"employee_number": 1
+	},
+	"reason": "Oil change",
+	"vip_treatment": true,
+	"is_finished": true
+}
+```
+
+<br>
+
+### Get the details of an appointment that does not exist
+---
+#### **Request**
+
+`GET /api/appointments/:id/`
+
+    http://localhost:8080/api/appointments/999/
+
+#### **Response**
+
+```yaml
+< HTTP/1.1 400 Bad Request
+< Date: Mon, 12 Dec 2022 08:50:10 GMT
+< Server: WSGIServer/0.2 CPython/3.10.9
+< Content-Type: application/json
+< X-Frame-Options: DENY
+< Content-Length: 55
+< X-Content-Type-Options: nosniff
+< Referrer-Policy: same-origin
+< Cross-Origin-Opener-Policy: same-origin
+< Vary: Origin
+```
+```json
+{
+	"message": "Invalid service appointment ID provided."
+}
+```
+
+<br>
+
+### Modify the details of an appointment
+---
+#### **Request**
+
+`PUT /api/appointments/:id/`
+
+    http://localhost:8080/api/appointments/1/
+
+```json
+{
+	"customer_name": "John Doe",
+	"date": "2022-12-06",
+	"time": "09:00",
+	"technician": 3,
+	"reason": "A reason"
+}
+```
+#### **Response**
+```yaml
+< HTTP/1.1 200 OK
+< Date: Wed, 07 Dec 2022 06:35:06 GMT
+< Server: WSGIServer/0.2 CPython/3.10.8
+< Content-Type: application/json
+< X-Frame-Options: DENY
+< Content-Length: 307
+< X-Content-Type-Options: nosniff
+< Referrer-Policy: same-origin
+< Cross-Origin-Opener-Policy: same-origin
+```
+
+```json
+{
+	"href": "/api/appointments/1/",
+	"id": 1,
+	"vin": "1C3CC5FB2AN120175",
+	"customer_name": "John Doe",
+	"date_time": "2022-12-06T09:00:00+00:00",
+	"technician": {
+		"href": "/api/technicians/3/",
+		"id": 3,
+		"name": "John Doer",
+		"employee_number": 3
+	},
+	"reason": "A reason",
+	"vip_treatment": false,
+	"is_finished": false
+}
+```
+
+<br>
+
+### Modify the details of an appointment that does not exist, or with invalid input
+---
+#### **Request**
+
+`PUT /api/appointments/:id/`
+
+    http://localhost:8080/api/appointments/999/
+
+```json
+{
+	"vin": "1C3CC5FB2AN120175",
+	"customer_name": "John Doe",
+	"date_time": "2022-12-06 09:00",
+	"technician": 1,
+	"reason": "A reason"
+}
+```
+#### **Response**
+```yaml
+< HTTP/1.1 404 Not Found
+< Date: Mon, 12 Dec 2022 09:12:21 GMT
+< Server: WSGIServer/0.2 CPython/3.10.9
+< Content-Type: application/json
+< X-Frame-Options: DENY
+< Content-Length: 49
+< X-Content-Type-Options: nosniff
+< Referrer-Policy: same-origin
+< Cross-Origin-Opener-Policy: same-origin
+< Vary: Origin
+```
+
+```json
+{
+	"message": "Service appointment does not exist"
+}
+```
+```json
+{
+	"message": "A value was specified that was longer than the allocated limit."
+}
+```
+
+```json
+{
+	"message": "Invalid Technician employee number provided."
+}
+```
+
+```json
+{
+	"message": "A value was specified with an invalid format."
+}
+```
+<br>
+
+### Delete an appointment
+---
+#### **Request**
+
+`DELETE /api/appointments/:id/`
+
+    http://localhost:8080/api/appointments/5/
+
+#### **Response**
+
+```yaml
+< HTTP/1.1 200 OK
+< Date: Mon, 12 Dec 2022 08:47:19 GMT
+< Server: WSGIServer/0.2 CPython/3.10.9
+< Content-Type: application/json
+< X-Frame-Options: DENY
+< Content-Length: 17
+< X-Content-Type-Options: nosniff
+< Referrer-Policy: same-origin
+< Cross-Origin-Opener-Policy: same-origin
+< Vary: Origin
+```
+
+```json
+{
+	"deleted": true
+}
+```
+
+<br>
+
+### Delete a deleted appointment, or an appointment that does not exist
+---
+#### **Request**
+
+`DELETE /api/appointments/:id/`
+
+    http://localhost:8080/api/appointments/999/
+
+#### **Response**
+
+```yaml
+< HTTP/1.1 200 OK
+< Date: Mon, 12 Dec 2022 09:25:24 GMT
+< Server: WSGIServer/0.2 CPython/3.10.9
+< Content-Type: application/json
+< X-Frame-Options: DENY
+< Content-Length: 18
+< X-Content-Type-Options: nosniff
+< Referrer-Policy: same-origin
+< Cross-Origin-Opener-Policy: same-origin
+< Vary: Origin
+```
+
+```json
+{
+	"deleted": false
+}
+```
+
+<br>
+
+### Mark an appointment as finished
+---
+#### **Request**
+
+`PUT /api/appointments/:id/finish/`
+
+    http://localhost:8080/api/appointments/5/finish/
+
+#### **Response**
+
+```yaml
+< HTTP/1.1 200 OK
+< Date: Wed, 07 Dec 2022 20:54:54 GMT
+< Server: WSGIServer/0.2 CPython/3.10.8
+< Content-Type: application/json
+< X-Frame-Options: DENY
+< Content-Length: 305
+< X-Content-Type-Options: nosniff
+< Referrer-Policy: same-origin
+< Cross-Origin-Opener-Policy: same-origin
+< Vary: Origin
+```
+
+```json
+{
+	"href": "/api/appointments/5/",
+	"id": 5,
+	"vin": "1C3CC5FB2AN120174",
+	"customer_name": "John Doe",
+	"date_time": "2022-12-06T09:00:00+00:00",
+	"technician": {
+		"href": "/api/technicians/1/",
+		"id": 1,
+		"name": "John Doe",
+		"employee_number": 1
+	},
+	"reason": "A reason",
+	"vip_treatment": true,
+	"is_finished": false
+}
+```
+
+<br>
+
+### Mark an appointment as finished for an appointment that does not exist
+---
+#### **Request**
+
+`PUT /api/appointments/:id/finish/`
+
+    http://localhost:8080/api/appointments/5/finish/
+
+#### **Response**
+
+```yaml
+< HTTP/1.1 404 Not Found
+< Date: Mon, 12 Dec 2022 09:26:46 GMT
+< Server: WSGIServer/0.2 CPython/3.10.9
+< Content-Type: application/json
+< X-Frame-Options: DENY
+< Content-Length: 49
+< X-Content-Type-Options: nosniff
+< Referrer-Policy: same-origin
+< Cross-Origin-Opener-Policy: same-origin
+< Vary: Origin
+```
+
+```json
+{
+	"message": "Service appointment does not exist"
+}
+```
+
+<br>
+
+<br>
+
+### Get a list of technicians
+---
+#### **Request**
+
+`GET /api/technicians/`
+
+    http://localhost:8080/api/technicians/
+
+#### **Response**
+
+```yaml
+< HTTP/1.1 200 OK
+< Date: Mon, 12 Dec 2022 09:31:12 GMT
+< Server: WSGIServer/0.2 CPython/3.10.9
+< Content-Type: application/json
+< X-Frame-Options: DENY
+< Content-Length: 288
+< X-Content-Type-Options: nosniff
+< Referrer-Policy: same-origin
+< Cross-Origin-Opener-Policy: same-origin
+< Vary: Origin
+```
+```json
+{
+	"technicians": [
+		{
+			"href": "/api/technicians/1/",
+			"id": 1,
+			"name": "Balor Rayhana",
+			"employee_number": 1
+		},
+		{
+			"href": "/api/technicians/3/",
+			"id": 3,
+			"name": "Cameron Jensen",
+			"employee_number": 3
+		},
+		{
+			"href": "/api/technicians/2/",
+			"id": 2,
+			"name": "Miracle Mechanic",
+			"employee_number": 2
+		}
+	]
+}
+```
+
+##### Without any technicians
+```json
+{
+    "technicians": []
+}
+```
+
+<br>
+
+### Create a technician
+---
+#### **Request**
+
+`POST /api/technicians/`
+
+    http://localhost:8080/api/technicians/
+
+```json
+{
+	"name": "Cameron Jensen",
+	"employee_number": 3
+}
+```
+
+<br>
+
+#### **Response**
+```yaml
+< HTTP/1.1 200 OK
+< Date: Mon, 12 Dec 2022 09:31:10 GMT
+< Server: WSGIServer/0.2 CPython/3.10.9
+< Content-Type: application/json
+< X-Frame-Options: DENY
+< Content-Length: 88
+< X-Content-Type-Options: nosniff
+< Referrer-Policy: same-origin
+< Cross-Origin-Opener-Policy: same-origin
+< Vary: Origin
+```
+
+```json
+{
+	"href": "/api/technicians/3/",
+	"id": 3,
+	"name": "Cameron Jensen",
+	"employee_number": 3
+}
+```
+
+<br>
+
+### Create a technician with invalid input
+---
+#### **Request**
+
+`POST /api/technicians/`
+
+    http://localhost:8080/api/technicians/
+
+```json
+{
+	"name": <200 char limit>,
+	"employee_number": <must not be an existing employee number>
+}
+```
+
+<br>
+
+#### **Response**
+```yaml
+< HTTP/1.1 400 Bad Request
+< Date: Mon, 12 Dec 2022 09:37:10 GMT
+< Server: WSGIServer/0.2 CPython/3.10.9
+< Content-Type: application/json
+< X-Frame-Options: DENY
+< Content-Length: 48
+< X-Content-Type-Options: nosniff
+< Referrer-Policy: same-origin
+< Cross-Origin-Opener-Policy: same-origin
+< Vary: Origin
+```
+
+```json
+{
+	"message": "Could not register the technician"
+}
+```
+
+<br>
+
+### Get the details of a technician
+---
+#### **Request**
+
+`GET /api/technicians/:id/`
+
+    http://localhost:8080/api/technicians/1/
+
+#### **Response**
+
+```yaml
+< HTTP/1.1 200 OK
+< Date: Mon, 12 Dec 2022 09:38:09 GMT
+< Server: WSGIServer/0.2 CPython/3.10.9
+< Content-Type: application/json
+< X-Frame-Options: DENY
+< Content-Length: 87
+< X-Content-Type-Options: nosniff
+< Referrer-Policy: same-origin
+< Cross-Origin-Opener-Policy: same-origin
+< Vary: Origin
+```
+```json
+{
+	"href": "/api/technicians/1/",
+	"id": 1,
+	"name": "Balor Rayhana",
+	"employee_number": 1
+}
+```
+
+<br>
+
+### Get the details of a technician that does not exist
+---
+#### **Request**
+
+`GET /api/technicians/:id/`
+
+    http://localhost:8080/api/technicians/999/
+
+#### **Response**
+
+```yaml
+< HTTP/1.1 400 Bad Request
+< Date: Mon, 12 Dec 2022 09:38:32 GMT
+< Server: WSGIServer/0.2 CPython/3.10.9
+< Content-Type: application/json
+< X-Frame-Options: DENY
+< Content-Length: 55
+< X-Content-Type-Options: nosniff
+< Referrer-Policy: same-origin
+< Cross-Origin-Opener-Policy: same-origin
+< Vary: Origin
+```
+```json
+{
+	"message": "Invalid technician employee ID provided."
+}
+```
+
+<br>
+
+### Modify the details of a technician
+---
+#### **Request**
+
+`PUT /api/technicians/:id/`
+
+    http://localhost:8080/api/technicians/1/
+
+```json
+{
+	"name": "Lénárd Eide",
+	"employee_number": 11
+}
+```
+#### **Response**
+```yaml
+< HTTP/1.1 200 OK
+< Date: Mon, 12 Dec 2022 09:39:16 GMT
+< Server: WSGIServer/0.2 CPython/3.10.9
+< Content-Type: application/json
+< X-Frame-Options: DENY
+< Content-Length: 96
+< X-Content-Type-Options: nosniff
+< Referrer-Policy: same-origin
+< Cross-Origin-Opener-Policy: same-origin
+< Vary: Origin
+```
+
+```json
+{
+	"href": "/api/technicians/1/",
+	"id": 1,
+	"name": "Lénárd Eide",
+	"employee_number": 11
+}
+```
+
+<br>
+
+### Modify the details of a technician that does not exist, or with invalid input
+---
+#### **Request**
+
+`PUT /api/technicians/:id/`
+
+    http://localhost:8080/api/technicians/1/
+
+```json
+{
+	"name": <200 char limit>,
+	"employee_number": <must not be an existing employee number>
+}
+```
+#### **Response**
+```yaml
+< HTTP/1.1 400 Bad Request
+< Date: Mon, 12 Dec 2022 09:40:11 GMT
+< Server: WSGIServer/0.2 CPython/3.10.9
+< Content-Type: application/json
+< X-Frame-Options: DENY
+< Content-Length: 71
+< X-Content-Type-Options: nosniff
+< Referrer-Policy: same-origin
+< Cross-Origin-Opener-Policy: same-origin
+< Vary: Origin
+```
+
+```json
+{
+	"message": "That Technician could not be found. "
+}
+```
+```json
+{
+	"message": "There is a technician with that employee number already."
+}
+```
+```json
+{
+	"message": "A value was specified that was longer than the allocated limit."
+}
+```
+
+<br>
+
+### Delete a technician
+---
+#### **Request**
+
+`DELETE /api/technicians/:id/`
+
+    http://localhost:8080/api/technicians/3/
+
+#### **Response**
+
+```yaml
+< HTTP/1.1 200 OK
+< Date: Mon, 12 Dec 2022 09:44:42 GMT
+< Server: WSGIServer/0.2 CPython/3.10.9
+< Content-Type: application/json
+< X-Frame-Options: DENY
+< Content-Length: 17
+< X-Content-Type-Options: nosniff
+< Referrer-Policy: same-origin
+< Cross-Origin-Opener-Policy: same-origin
+< Vary: Origin
+```
+
+```json
+{
+	"deleted": true
+}
+```
+
+<br>
+
+### Delete a deleted technician, or a technician that does not exist
+---
+#### **Request**
+
+`DELETE /api/technicians/:id/`
+
+    http://localhost:8080/api/technicians/999/
+
+#### **Response**
+
+```yaml
+< HTTP/1.1 200 OK
+< Date: Mon, 12 Dec 2022 09:45:07 GMT
+< Server: WSGIServer/0.2 CPython/3.10.9
+< Content-Type: application/json
+< X-Frame-Options: DENY
+< Content-Length: 18
+< X-Content-Type-Options: nosniff
+< Referrer-Policy: same-origin
+< Cross-Origin-Opener-Policy: same-origin
+< Vary: Origin
+```
+
+```json
+{
+	"deleted": false
+}
+```
+
+<br>
+
+### Delete a technician associated to an appointment
+---
+#### **Request**
+
+`DELETE /api/technicians/:id/`
+
+    http://localhost:8080/api/technicians/1/
+
+#### **Response**
+
+```yaml
+< HTTP/1.1 400 Bad Request
+< Date: Mon, 12 Dec 2022 09:46:01 GMT
+< Server: WSGIServer/0.2 CPython/3.10.9
+< Content-Type: application/json
+< X-Frame-Options: DENY
+< Content-Length: 49
+< X-Content-Type-Options: nosniff
+< Referrer-Policy: same-origin
+< Cross-Origin-Opener-Policy: same-origin
+< Vary: Origin
+```
+
+```json
+{
+	"message": "That technician cannot be deleted."
+}
+```
+
+<br>
+<br>
+
 ## Sales Microservice
 ---
 The sales microservice keeps track of the company's sales persons' information, customer database, as well as sales records, with some help from the inventory microservice. Polling has been implemented to grab vehicles from the inventory microservice, (specifically unsold vehicles), so that sales records can only be generated for an unsold vehicle. Because a sales record should be permanent, the project has been set up such that it is not possible to delete a customer, a vehicle, or a sales person that is associated with a sales record.
 
 In addition to a list view of sales persons, customers, and sales records, users can also filter sales records based on a sales person.
 
+<br>
+
 ### RESTful Sales API
 ---
-The REST API for the sales microservice is detailed below.
+The REST API for the `sales-api` microservice is detailed below.
+
+<br>
+
 #### Sales Persons:
 | Method | URL                   | What it does                      |
 | ------ | :-------------------- | :-------------------------------- |
@@ -138,6 +1192,9 @@ The REST API for the sales microservice is detailed below.
 | POST   | /api/salesperson/     | Create a sales person             |
 | PUT    | /api/salesperson/:id/ | Edit a sales person               |
 | DELETE | /api/salesperson/:id/ | Deletes a sales person            |
+
+<br>
+
 #### Customers:
 | Method | URL                | What it does                  |
 | ------ | :----------------- | :---------------------------- |
@@ -146,6 +1203,9 @@ The REST API for the sales microservice is detailed below.
 | POST   | /api/customer/     | Create a customer             |
 | PUT    | /api/customer/:id/ | Edit a customer               |
 | DELETE | /api/customer/:id/ | Deletes a sales person        |
+
+<br>
+
 #### Sales Record
 | Method | URL                               | What it does                                            |
 | ------ | :-------------------------------- | :------------------------------------------------------ |
@@ -155,6 +1215,8 @@ The REST API for the sales microservice is detailed below.
 | POST   | /api/salesrecord/                 | Create a sales record                                   |
 | PUT    | /api/salesrecord/:id/             | Edit a sales record                                     |
 ##### Note that a request to delete sales records does not exist. From an industrial standpoint, sales records should be permanent, so a delete request method was not implemented.
+
+<br>
 
 ### Get a list of all sales persons
 ---
@@ -213,6 +1275,8 @@ The REST API for the sales microservice is detailed below.
 }
 ```
 
+<br>
+
 ### Get details on a sales person
 ---
 #### **Request**
@@ -243,6 +1307,9 @@ The REST API for the sales microservice is detailed below.
 	"id": 4
 }
 ```
+
+<br>
+
 ### Create a sales person
 ---
 #### **Request**
@@ -280,6 +1347,9 @@ The REST API for the sales microservice is detailed below.
     "id": 5
 }
 ```
+
+<br>
+
 ### Edit a sales person
 ---
 #### **Request**
@@ -317,6 +1387,9 @@ The REST API for the sales microservice is detailed below.
     "id": 5
 }
 ```
+
+<br>
+
 ### Delete a sales person
 ---
 #### **Request**
@@ -344,6 +1417,8 @@ The REST API for the sales microservice is detailed below.
 	"deleted": true
 }
 ```
+
+<br>
 
 ### Get a list of all customers
 ---
@@ -406,6 +1481,8 @@ The REST API for the sales microservice is detailed below.
 }
 ```
 
+<br>
+
 ### Get details on a Customer
 ---
 #### **Request**
@@ -437,6 +1514,8 @@ The REST API for the sales microservice is detailed below.
 	"id": 1
 }
 ```
+
+<br>
 
 ### Create a customer
 ---
@@ -477,6 +1556,9 @@ The REST API for the sales microservice is detailed below.
 	"id": 5
 }
 ```
+
+<br>
+
 ### Edit a customer
 ---
 #### **Request**
@@ -515,6 +1597,9 @@ The REST API for the sales microservice is detailed below.
 	"id": 5
 }
 ```
+
+<br>
+
 ### Delete a customer
 ---
 #### **Request**
@@ -542,6 +1627,8 @@ The REST API for the sales microservice is detailed below.
 	"deleted": true
 }
 ```
+
+<br>
 
 ### Get a list of all sales records
 ---
@@ -627,6 +1714,9 @@ The REST API for the sales microservice is detailed below.
     "sales_records": []
 }
 ```
+
+<br>
+
 ### Get sales records filtered by sales person
 ---
 #### **Request**
@@ -688,6 +1778,8 @@ The REST API for the sales microservice is detailed below.
 }
 ```
 
+<br>
+
 ### Get details on a Sales Record
 ---
 #### **Request**
@@ -737,6 +1829,8 @@ The REST API for the sales microservice is detailed below.
 	"id": 2
 }
 ```
+
+<br>
 
 ### Create a sales record
 ---
@@ -796,6 +1890,9 @@ The REST API for the sales microservice is detailed below.
 	"id": 5
 }
 ```
+
+<br>
+
 ### Edit a sales record
 ---
 #### **Request**
@@ -878,13 +1975,16 @@ The REST API for the sales microservice is detailed below.
 	"id": 1
 }
 ```
+
+<br>
+
 ## Models
  **AutomobileVO**
 #### The AutomobileVO object is based off of the Automobile model from the inventory microservice.
 | Attribute   |  Type   |           Options           |
 | ----------- | :-----: | :-------------------------: |
 | color       | string  |        max. 50 chars        |
-| year        | integer |                             |
+| year        | integer |      positive smallint      |
 | vin         | string  | max. 17 chars, unique=True  |
 | import_href | string  | max. 200 chars, unique=True |
 | model_name  | string  |       max. 100 chars        |
@@ -892,10 +1992,10 @@ The REST API for the sales microservice is detailed below.
 
  **Sales Person**
 
-| Attribute       |  Type   |    Options     |
-| --------------- | :-----: | :------------: |
-| name            | string  | max. 200 chars |
-| employee_number | integer |  unique=True   |
+| Attribute       |  Type   |            Options             |
+| --------------- | :-----: | :----------------------------: |
+| name            | string  |         max. 200 chars         |
+| employee_number | integer | positive smallint, unique=True |
 
  **Customer**
 
@@ -907,25 +2007,35 @@ The REST API for the sales microservice is detailed below.
 
  **Sales Record**
 
-| Attribute    |    Type     |             Options              |
-| ------------ | :---------: | :------------------------------: |
-| price        |   decimal   | max. 10 chars, max 2 dec. places |
-| automobile   | foreign key |        on_delete=PROTECT         |
-| sales_person | foreign key |        on_delete=PROTECT         |
-| customer     | foreign key |        on_delete=PROTECT         |
+| Attribute    |        Type        |             Options              |
+| ------------ | :----------------: | :------------------------------: |
+| price        |       float        | max. 10 chars, max 2 dec. places |
+| automobile   | foreign key object |        on_delete=PROTECT         |
+| sales_person | foreign key object |        on_delete=PROTECT         |
+| customer     | foreign key object |        on_delete=PROTECT         |
 
-#### The attributes in each model are used to describe or identify an object. The options are the limitations for the value of the objects. For instance, it is not possible to input a string for the year of an automobile because it has been specified to be an integer field. Foreign keys have significance as they describe the dependancy between the model object and the attribute. Specifically for sales records, any automobile, sales_person, or customer that has a sales record will be protected because it is not possible to delete a sales record.
+The attributes in each model are used to describe or identify an object. The options are the limitations for the value of the objects. For instance, it is not possible to input a string for the year of an automobile because it has been specified to be an integer field. Foreign keys have significance as they describe the dependancy between the model object and the attribute. Specifically for sales records, any automobile, sales_person, or customer that has a sales record will be protected because it is not possible to delete a sales record.
 
 **Value Objects**
-#### Customers, sales persons, and sales records are their own entities, while the attributes that describe them are value objects. They are intrinsic for describing an entity, so they are implemented as an attribute. Note that in the model for sales record, each automobile, sales_person, and customer is acting as a value obejct that describes the sales record.
+
+Customers, sales persons, and sales records are their own entities, while the attributes that describe them are value objects. They are intrinsic for describing an entity, so they are implemented as an attribute. Note that in the model for sales record, each automobile, sales_person, and customer is acting as a value obejct that describes the sales record.
+
+<br>
+<br>
 
 ## Inventory Microservice
 ---
-The inventory microservice keeps track of automobiles that are either currently in stock or has been sold to a customer. The vehicle type and manufacturer of those automobiles are also tracked in this microservice. Both the sales and service microservices have a AutomobileVO model that polls data from this microservice. Because the polling creates a copy of the automobiles, it is okay to make changes to the automobiles, vehicle, and manufacturer, including deletion. Upon deletion of a manufacturer, all associated vehicles will be deleted because of the foreign key association. Similarly, when a vehicle model is deleted, any automobiles associated with that vehicle model will also be removed. Again, these changes would not effect the database of the sales or service microservices because polling by the AutomobileVO objects creates an immutable copy of the automobiles.
+The inventory microservice ultimately keeps track of automobiles (with their corresponding manufacturer and vehicle model) that are either currently in stock, or have been sold to a customer. The `Automobile` model relies on the `Vehicle` model in a many-to-one relationship via a Foreign Key, and analogously for the `Vehicle` model to the `Manufacturer` model.
+
+Changes made to the `Automobile` model (such as whether the automobile was sold) are updated on associated microservices (`sales-api` and `service-api`) via **polling**.
+
+Deletion of any instances of `Manufacturer` causes a cascade deletion of related `Vehicle` instances, which subsequently causes another cascade deletion of related `Automobile` instances. Value objects already generated on associated microservices will remain unaffected by deletions performed on the `inventory-api`.
+
+<br>
 
 ### RESTful Inventory API
 ---
-The REST API for the inventory microservice is detailed below.
+The REST API for the `inventory-api` microservice is detailed below.
 #### Manufacturer:
 | Method | URL                     | What it does                      |
 | ------ | :---------------------- | :-------------------------------- |
@@ -950,6 +2060,9 @@ The REST API for the inventory microservice is detailed below.
 | POST   | /api/automobiles/      | Create an automobile             |
 | PUT    | /api/automobiles/:vin/ | Edit an automobile               |
 | DELETE | /api/automobiles/:vin/ | Delete an automobile             |
+
+<br>
+
 ### Get a list of all manufacturers
 ---
 #### **Request**
@@ -1006,6 +2119,9 @@ The REST API for the inventory microservice is detailed below.
     "manufacturers": []
 }
 ```
+
+<br>
+
 ### Get details on a manufacturer
 ---
 #### **Request**
@@ -1036,6 +2152,9 @@ The REST API for the inventory microservice is detailed below.
 	"name": "Hyundai"
 }
 ```
+
+<br>
+
 ### Create a Manufacturer
 ---
 #### **Request**
@@ -1072,6 +2191,9 @@ The REST API for the inventory microservice is detailed below.
 	"name": "Lexus"
 }
 ```
+
+<br>
+
 ### Edit a manufacturer
 ---
 #### **Request**
@@ -1079,6 +2201,7 @@ The REST API for the inventory microservice is detailed below.
 `PUT /api/manufacturers/:id/`
 
     http://localhost:8100/api/manufacturers/:id/
+
 ##### The manufacturer id can be obtained by viewing the list of all manufacturers.
 #### **Response**
 
@@ -1109,6 +2232,9 @@ The REST API for the inventory microservice is detailed below.
 	"name": "Lexxus"
 }
 ```
+
+<br>
+
 ### Delete a manufacturer
 ---
 #### **Request**
@@ -1136,6 +2262,9 @@ The REST API for the inventory microservice is detailed below.
 	"name": "Honda"
 }
 ```
+
+<br>
+
 ### Get a list of all vehicle models
 ---
 #### **Request**
@@ -1194,6 +2323,9 @@ The REST API for the inventory microservice is detailed below.
     "models": []
 }
 ```
+
+<br>
+
 ### Get details on a vehicle model
 ---
 #### **Request**
@@ -1230,6 +2362,9 @@ The REST API for the inventory microservice is detailed below.
 	}
 }
 ```
+
+<br>
+
 ### Create a Vehicle Model
 ---
 #### **Request**
@@ -1274,6 +2409,9 @@ The REST API for the inventory microservice is detailed below.
 	}
 }
 ```
+
+<br>
+
 ### Edit a vehicle model
 ---
 #### **Request**
@@ -1331,6 +2469,9 @@ The REST API for the inventory microservice is detailed below.
 	}
 }
 ```
+
+<br>
+
 ### Delete a vehicle model
 ---
 #### **Request**
@@ -1364,6 +2505,9 @@ The REST API for the inventory microservice is detailed below.
 	}
 }
 ```
+
+<br>
+
 ### Get a list of all automobiles
 ---
 #### **Request**
@@ -1419,6 +2563,9 @@ The REST API for the inventory microservice is detailed below.
     "autos": []
 }
 ```
+
+<br>
+
 ### Get details on an automobile
 ---
 #### **Request**
@@ -1467,6 +2614,9 @@ The REST API for the inventory microservice is detailed below.
 	]
 }
 ```
+
+<br>
+
 ### Create an automobile
 ---
 #### **Request**
@@ -1520,6 +2670,9 @@ The REST API for the inventory microservice is detailed below.
 	"is_sold": false
 }
 ```
+
+<br>
+
 ### Edit an automobile
 ---
 #### **Request**
@@ -1593,6 +2746,9 @@ The REST API for the inventory microservice is detailed below.
 	"is_sold": false
 }
 ```
+
+<br>
+
 ### Delete an automobile
 ---
 #### **Request**
@@ -1635,28 +2791,39 @@ The REST API for the inventory microservice is detailed below.
 	"is_sold": false
 }
 ```
+
+<br>
+
 ## Models
+
+<br>
+
  **Manufacturer**
-| Attribute |  Type  |           Options           |
-| --------- | :----: | :-------------------------: |
-| name      | string | max. 100 chars, unique=True |
+| Attribute |  Type  |           Options           | Description                  |
+| --------- | :----: | :-------------------------: | ---------------------------- |
+| name      | string | max. 100 chars, unique=True | The name of the manufacturer |
+
+<br>
 
 
  **VehicleModel**
-| Attribute    |    Type     |      Options      |
-| ------------ | :---------: | :---------------: |
-| name         |   string    |  max. 100 chars   |
-| picture_url  |             |                   |
-| manufacturer | foreign key | on_delete=CASCADE |
+| Attribute    |       Type        |      Options      | Description                             |
+| ------------ | :---------------: | :---------------: | --------------------------------------- |
+| name         |      string       |  max. 100 chars   | The name of the vehicle model           |
+| picture_url  |      string       |        url        | URL for a picture for the vehicle model |
+| manufacturer | ForeignKey object | on_delete=CASCADE | The manufacturer of the vehicle model   |
 
+<br>
 
  **Automobile**
-| Attribute |    Type     |          Options           |
-| --------- | :---------: | :------------------------: |
-| color     |   string    |       max. 50 chars        |
-| year      |   integer   |                            |
-| vin       |   string    | max. 17 chars, unique=True |
-| is_sold   |   boolean   |       default=False        |
-| model     | foreign key |     on_delete=CASCADE      |
+| Attribute |       Type        |          Options           | Description                                  |
+| --------- | :---------------: | :------------------------: | -------------------------------------------- |
+| color     |      string       |       max. 50 chars        | The color of the automobile                  |
+| year      |        int        |     positive smallint      | The year of the vehicle model                |
+| vin       |      string       | max. 17 chars, unique=True | The VIN number registered for the automobile |
+| is_sold   |      boolean      |       default=False        | Whether the automobile has been sold or not  |
+| model     | ForeignKey object |     on_delete=CASCADE      | The vehicle model of the automobile          |
 
-#### The attributes in each model are used to describe or identify an object. The options are the limitations for the value of the objects. For instance, each VIN must be unique and can be used as an automobile identifier. This makes sense because when you register an automobile (with, for example, DMV), no two autombiles will be assigned the same VIN. Foreign keys have significance as they describe the dependancy between the model object and the attribute. Manufacturer serves as a foriegn key value object to vehicle models, and vehicle models serve as the foreign key for automobiles. When a manufacturer is deleted, all vehicle models made by that manufacturer will also be deleted. And when a vehicle model is deleted, all automobiles affiliated with that vehicle model will be removed from the database as well. Please note that these changes do not affect the sales and service microservices database. Through polling, each microservice creates a duplicate copy of automobiles for their own database, so making changes in the inventory microservices database will not create any changes for the sales or service microservice.
+<br>
+
+The attributes in each model are used to describe or identify an object. The options are the limitations for the value of the objects. For instance, each VIN must be unique and can be used as an automobile identifier. This makes sense because when you register an automobile (with, for example, DMV), no two autombiles will be assigned the same VIN. Foreign keys have significance as they describe the dependancy between the model object and the attribute. Manufacturer serves as a foriegn key value object to vehicle models, and vehicle models serve as the foreign key for automobiles. When a manufacturer is deleted, all vehicle models made by that manufacturer will also be deleted. And when a vehicle model is deleted, all automobiles affiliated with that vehicle model will be removed from the database as well. Please note that these changes do not affect the sales and service microservices database. Through polling, each microservice creates a duplicate copy of automobiles for their own database, so making changes in the inventory microservices database will not create any changes for the sales or service microservice.

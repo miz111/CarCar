@@ -1,5 +1,5 @@
 import React from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 
 function withExtras(Component) {
   return (props) => (
@@ -44,7 +44,7 @@ class TechnicianEdit extends React.Component {
       this.setState({ failedAttempt: true });
       setTimeout(() => {
         this.setState({ failedAttempt: false });
-      }, 1000);
+      }, 2000);
     }
   }
 
@@ -67,6 +67,14 @@ class TechnicianEdit extends React.Component {
     return (
       <div className="row">
         <div className="offset-3 col-6">
+          <Link to="/technicians">
+            <button
+              type="button"
+              className="btn btn-secondary btn-md px-4 mt-3"
+            >
+              ↩ Return to technicians list
+            </button>
+          </Link>
           <div className={containerClasses}>
             <h1>Update a technician</h1>
             <form onSubmit={this.handleSubmit} id="update-technician-form">
@@ -99,7 +107,7 @@ class TechnicianEdit extends React.Component {
                 />
                 <label htmlFor="employee_number">Employee number</label>
               </div>
-              <button className="btn btn-primary">Create</button>
+              <button className="btn btn-primary">Edit</button>
             </form>
           </div>
           <div
@@ -109,7 +117,7 @@ class TechnicianEdit extends React.Component {
             The technician has been updated.
           </div>
           <div className={failedAttemptClasses} id="failed-attempt-message">
-            Failed to update the technician...
+            Failed to update the technician... there may be a technician with that employee number already...
           </div>
         </div>
       </div>

@@ -44,6 +44,11 @@ class VehicleList extends React.Component {
             Add vehicle
           </button>
         </Link>
+        <Link to="/vehicles/picture-view">
+          <button type="button" className="btn btn-success btn-md px-4 mx-2">
+            Switch views
+          </button>
+        </Link>
         <table className="table table-striped table-hover text-center">
           <thead>
             <tr>
@@ -58,14 +63,12 @@ class VehicleList extends React.Component {
               return (
                 <tr key={model.href} className="align-middle">
                   <td className="text-capitalize">{model.name}</td>
-                  <td className="text-capitalize">
-                    {model.manufacturer.name}
-                  </td>
+                  <td className="text-capitalize">{model.manufacturer.name}</td>
                   <td>
                     <img
                       src={model.picture_url}
                       alt={model.name}
-                      style={{ maxHeight: "200px" }}
+                      style={{ maxHeight: "200px", maxWidth: "200px" }}
                     />
                   </td>
                   <td>

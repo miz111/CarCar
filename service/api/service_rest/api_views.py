@@ -1,7 +1,8 @@
 from django.http import JsonResponse
 from django.views.decorators.http import require_http_methods
 import json
-from django.db import IntegrityError
+from django.db import IntegrityError, DataError
+from django.core.exceptions import ValidationError
 
 from .encoders import (
     TechnicianEncoder,
@@ -34,7 +35,20 @@ def api_list_appointments(request):
             del content["vip_treatment"]
         if hasattr(content, "is_finished"):
             del content["is_finished"]
-        service_appointment = ServiceAppointment.objects.create(**content)
+        try:
+            service_appointment = ServiceAppointment.objects.create(**content)
+        except ValidationError:
+            return JsonResponse(
+                {"message": "A value was specified with an invalid format."},
+                status=400,
+            )
+        except DataError:
+            return JsonResponse(
+                {
+                    "message": "A value was specified that was longer than the allocated limit."
+                },
+                status=400,
+            )
         return JsonResponse(
             service_appointment,
             encoder=ServiceAppointmentEncoder,
@@ -75,12 +89,24 @@ def api_show_appointment(request, pk):
                         {"message": "Invalid Technician employee number provided."},
                         status=400,
                     )
-            props = ["customer_name", "date", "time", "reason"]
+            props = ["vin", "customer_name", "date_time", "reason"]
             for prop in props:
                 if prop in content:
                     setattr(service_appointment, prop, content[prop])
-            service_appointment.save()
-
+            try:
+                service_appointment.save()
+            except ValidationError:
+                return JsonResponse(
+                    {"message": "A value was specified with an invalid format."},
+                    status=400,
+                )
+            except DataError:
+                return JsonResponse(
+                    {
+                        "message": "A value was specified that was longer than the allocated limit."
+                    },
+                    status=400,
+                )
             return JsonResponse(
                 service_appointment,
                 encoder=ServiceAppointmentEncoder,
@@ -165,7 +191,6 @@ def api_show_technician(request, pk):
             for prop in props:
                 if prop in content:
                     setattr(technician, prop, content[prop])
-
             try:
                 technician.save()
             except IntegrityError:
@@ -175,7 +200,13 @@ def api_show_technician(request, pk):
                     },
                     status=400,
                 )
-
+            except DataError:
+                return JsonResponse(
+                    {
+                        "message": "A value was specified that was longer than the allocated limit."
+                    },
+                    status=400,
+                )
             return JsonResponse(
                 technician,
                 encoder=TechnicianEncoder,

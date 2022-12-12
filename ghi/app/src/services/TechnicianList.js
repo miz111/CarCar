@@ -32,7 +32,7 @@ class TechnicianList extends React.Component {
         this.setState({ failedAttempt: true });
         setTimeout(() => {
           this.setState({ failedAttempt: false });
-        }, 1000);
+        }, 2000);
       }
     }
   }
@@ -73,7 +73,7 @@ class TechnicianList extends React.Component {
           The technician has been deleted.
         </div>
         <div className={failedAttemptClasses} id="failed-attempt-message">
-          That technician cannot be deleted.
+          That technician cannot be deleted likely because they have a service appointment history.
         </div>
         <table className="table table-striped table-hover text-center">
           <thead>

@@ -1,5 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import Button from 'react-bootstrap/Button';
+import Modal from 'react-bootstrap/Modal';
 
 class AppointmentList extends React.Component {
   constructor(props) {
@@ -98,8 +100,13 @@ class AppointmentList extends React.Component {
   }
 
   handleFilterChange(e) {
-    this.setState({ [e.target.id]: e.target.value });
-    this.setState({ searchTerm: "" });
+    this.setState({ [e.target.id]: e.target.value }, () => {
+      this.setState({ searchTerm: "" }, () => {
+        this.setState({
+          service_appointments_copy: this.state.service_appointments,
+        });
+      });
+    });
   }
 
   async componentDidMount() {
@@ -145,7 +152,7 @@ class AppointmentList extends React.Component {
               placeholder={`Filter by... ${
                 this.state.filterCriteria === "customer_name"
                   ? "customer name"
-                  : this.state.filterCriteria
+                  : this.state.filterCriteria === "Filter" ? "filter" : this.state.filterCriteria
               }`}
               id="searchTerm"
               value={this.state.searchTerm}
@@ -162,7 +169,7 @@ class AppointmentList extends React.Component {
           </button>
         </Link>
         <Link to="/appointments/history">
-          <button type="button" className="btn btn-primary btn-md px-4 mx-2">
+          <button type="button" className="btn btn-secondary btn-md px-4 mx-2">
             Service history
           </button>
         </Link>

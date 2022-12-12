@@ -44,7 +44,7 @@ class TechnicianForm extends React.Component {
       this.setState({ failedAttempt: true });
       setTimeout(() => {
         this.setState({ failedAttempt: false });
-      }, 1000);
+      }, 1500);
     }
   }
 
@@ -115,7 +115,7 @@ class TechnicianForm extends React.Component {
             The technician has been added.
           </div>
           <div className={failedAttemptClasses} id="failed-attempt-message">
-            Failed to add the technician...
+            Failed to add the technician...there may be a technician with that employee number already...
           </div>
         </div>
       </div>

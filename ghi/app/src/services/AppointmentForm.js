@@ -109,7 +109,7 @@ class AppointmentForm extends React.Component {
               type="button"
               className="btn btn-secondary btn-md px-4 mt-3"
             >
-              ↩Return to appointments list
+              ↩ Return to appointments list
             </button>
           </Link>
           <div className="shadow p-4 mt-4">
