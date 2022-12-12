@@ -41,7 +41,6 @@ class SalesRecordForm extends React.Component {
                 'Content-Type': 'application/json',
             },
         };
-        console.log(data);
         const response = await fetch(salesRecordUrl, fetchConfig)
 
         const autoUrl = `http://localhost:8100/api/automobiles/${this.state.automobile}/`
