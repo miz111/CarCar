@@ -5,7 +5,7 @@ import json
 from django.http import JsonResponse
 from django.views.decorators.http import require_http_methods
 
-# Create your views here.
+
 class AutomobileListEncoder(ModelEncoder):
     model = AutomobileVO
     properties = ["import_href", "id", "color", "year", "vin", "model_name", "is_sold"]
@@ -130,7 +130,7 @@ def api_list_sales_record(request):
             safe=False
         )
 
-@require_http_methods(["GET", "PUT", "DELETE"])
+@require_http_methods(["GET", "PUT"])
 def api_show_sales_record(request, pk):
     if request.method == "GET":
         sales_record = SalesRecord.objects.get(id=pk)
@@ -139,9 +139,6 @@ def api_show_sales_record(request, pk):
             encoder=SalesRecordEncoder,
             safe=False
         )
-    elif request.method == "DELETE":
-        count, _ = SalesRecord.objects.filter(id=pk).delete()
-        return JsonResponse({"deleted": count > 0})
     elif request.method == "PUT":
         content = json.loads(request.body)
         SalesRecord.objects.filter(id=pk).update(**content)

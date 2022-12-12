@@ -10,8 +10,6 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "sales_project.settings")
 django.setup()
 
 from sales_rest.models import AutomobileVO
-# Import models from sales_rest, here.
-# from sales_rest.models import Something
 
 def find_automobile():
     response = requests.get("http://inventory-api:8000/api/automobiles/")
