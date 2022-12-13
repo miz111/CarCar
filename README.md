@@ -369,8 +369,8 @@ The REST API for the `service-api` microservice is detailed below.
 
 ```json
 {
-	"name": <200 char limit>,
-	"employee_number": <must not be an existing employee number>
+	"name": "200 char limit",
+	"employee_number": "must not be an existing employee number"
 }
 ```
 
@@ -510,8 +510,8 @@ The REST API for the `service-api` microservice is detailed below.
 
 ```json
 {
-	"name": <200 char limit>,
-	"employee_number": <must not be an existing employee number>
+	"name": "200 char limit",
+	"employee_number": "must not be an existing employee number"
 }
 ```
 #### **Response**
@@ -807,11 +807,11 @@ The REST API for the `service-api` microservice is detailed below.
 
 ```json
 {
-	"vin": <17 char limit>,
-	"customer_name": <200 char limit>,
-	"date_time": <non-datetime format>,
-	"technician": <invalid employee_number>,
-	"reason": <200 char limit>
+	"vin": "17 char limit",
+	"customer_name": "200 char limit",
+	"date_time": "non-datetime format",
+	"technician": "invalid employee_number",
+	"reason": "200 char limit"
 }
 ```
 ##### *employee number is specified for the technician property
