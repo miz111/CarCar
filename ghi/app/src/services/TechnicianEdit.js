@@ -22,10 +22,10 @@ class TechnicianEdit extends React.Component {
 
   async handleSubmit(event) {
     event.preventDefault();
-    const data = { ...this.state };
-    delete data.success;
-    delete data.failedAttempt;
-
+    const data = {
+      name: this.state.name,
+      employee_number: this.state.employee_number,
+    };
     const techniciansUrl = `http://localhost:8080/api/technicians/${this.props.params.id}/`;
     const fetchConfig = {
       method: "put",
@@ -117,7 +117,8 @@ class TechnicianEdit extends React.Component {
             The technician has been updated.
           </div>
           <div className={failedAttemptClasses} id="failed-attempt-message">
-            Failed to update the technician... there may be a technician with that employee number already...
+            Failed to update the technician... there may be a technician with
+            that employee number already...
           </div>
         </div>
       </div>

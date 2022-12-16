@@ -19,6 +19,7 @@ import AppointmentList from "./services/AppointmentList";
 import AppointmentForm from "./services/AppointmentForm";
 import AppointmentHistory from "./services/AppointmentHistory";
 import AppointmentFilter from "./services/AppointmentFilter";
+import AppointmentEdit from "./services/AppointmentEdit";
 import TechnicianForm from "./services/TechnicianForm";
 import TechnicianList from "./services/TechnicianList";
 import TechnicianEdit from "./services/TechnicianEdit";
@@ -63,6 +64,10 @@ function App() {
             <Route path="history" element={<AppointmentHistory />} />
             <Route path="filter" element={<AppointmentFilter />} />
             <Route path="new" element={<AppointmentForm />} />
+            <Route
+              path="edit/:id/:vin/:customer_name/:date/:time/:technician/:reason"
+              element={<AppointmentEdit />}
+            />
           </Route>
           <Route path="technicians">
             <Route index element={<TechnicianList />} />

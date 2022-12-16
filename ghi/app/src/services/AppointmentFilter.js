@@ -49,10 +49,7 @@ class AppointmentFilter extends React.Component {
             },
             () => {
               this.setState({
-                service_appointments_copy:
-                  this.state.service_appointments.filter((x) => {
-                    return x.is_finished;
-                  }),
+                service_appointments_copy: this.state.service_appointments,
               });
             }
           );
