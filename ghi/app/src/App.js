@@ -9,11 +9,14 @@ import VehicleForm from "./inventory/VehicleForm";
 import AutomobileList from "./inventory/AutomobileList";
 import AutomobileForm from "./inventory/AutomobileForm";
 import SalesList from "./sales/SalesList";
+import SalesRecordEdit from "./sales/SalesRecordEdit";
 import SalesRecordForm from "./sales/SalesRecordForm";
 import CustomerList from "./sales/CustomerList";
 import CustomerForm from "./sales/CustomerForm";
+import CustomerEdit from "./sales/CustomerEdit";
 import SalesPersonList from "./sales/SalesPersonList";
 import SalesPersonForm from "./sales/SalesPersonForm";
+import SalesPersonEdit from "./sales/SalesPersonEdit";
 import SalesHistory from "./sales/SalesHistory";
 import AppointmentList from "./services/AppointmentList";
 import AppointmentForm from "./services/AppointmentForm";
@@ -46,14 +49,17 @@ function App() {
           <Route path="salesperson">
             <Route index element={<SalesPersonList />} />
             <Route path="new" element={<SalesPersonForm />} />
+            <Route path="edit/:id/:name/:employee_number" element={<SalesPersonEdit />} />
           </Route>
           <Route path="customer">
             <Route index element={<CustomerList />} />
             <Route path="new" element={<CustomerForm />} />
+            <Route path="edit/:id/:name/:address/:phone_number" element={<CustomerEdit />} />
           </Route>
           <Route path="sales-record">
             <Route index element={<SalesList />} />
             <Route path="new" element={<SalesRecordForm />} />
+            <Route path="edit/:id/:sales_person/:customer/:automobile/:price" element={<SalesRecordEdit />} />
           </Route>
           <Route path="sales-history">
             <Route index element={<SalesHistory />} />

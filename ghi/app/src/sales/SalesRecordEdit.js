@@ -1,22 +1,29 @@
-import React from 'react';
-import { Link } from "react-router-dom";
+import React from "react";
+import { useParams, useNavigate, Link } from "react-router-dom";
 
-class SalesRecordForm extends React.Component {
+function withExtras(Component) {
+    return (props) => (
+        <Component {...props} params={useParams()} useNavigate={useNavigate()} />
+    );
+}
+
+class SalesRecordEdit extends React.Component {
     constructor(props) {
-        super(props)
+        super(props);
         this.state = {
-            automobile: '',
-            salesPerson: '',
-            customer: '',
-            price: '',
+            sales_person: this.props.params.sales_person,
+            customer: this.props.params.customer,
+            automobile: this.props.params.automobile,
+            price: this.props.params.price,
             automobiles: [],
             salesPersons: [],
             customers: [],
-            unsoldAutos: [],
+            success: false,
+            failedAttempt: false,
         };
-        this.handleAutomobileChange = this.handleAutomobileChange.bind(this);
         this.handleSalesPersonChange = this.handleSalesPersonChange.bind(this);
         this.handleCustomerChange = this.handleCustomerChange.bind(this);
+        this.handleAutomobileChange = this.handleAutomobileChange.bind(this);
         this.handlePriceChange = this.handlePriceChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
     }
@@ -24,61 +31,48 @@ class SalesRecordForm extends React.Component {
     async handleSubmit(event) {
         event.preventDefault();
         const data = { ...this.state };
-        data.sales_person = data.salesPerson;
-        delete data.salesPerson;
-        data.vin = data.automobile;
-        delete data.automobile;
+        delete data.success;
+        delete data.failedAttempt;
         delete data.automobiles;
         delete data.salesPersons;
         delete data.customers;
-        delete data.unsoldAutos;
 
-        const salesRecordUrl = 'http://localhost:8090/api/salesrecord/';
+
+        const salesRecordUrl = `http://localhost:8090/api/salesrecord/${this.props.params.id}/`;
         const fetchConfig = {
-            method: "post",
+            method: "put",
             body: JSON.stringify(data),
             headers: {
-                'Content-Type': 'application/json',
+                "Content-Type": "application/json",
             },
         };
-        const response = await fetch(salesRecordUrl, fetchConfig)
-
-        const autoUrl = `http://localhost:8100/api/automobiles/${this.state.automobile}/`
-        const fetchConfig1 = {
-            method: "put",
-            body: JSON.stringify({ "is_sold": true }),
-            headers: {
-                'Content-Type': 'application/json',
-            },
+        const response = await fetch(salesRecordUrl, fetchConfig);
+        if (response.ok) {
+            this.setState({ success: true });
+            setTimeout(() => {
+                this.props.useNavigate("/sales-record");
+            }, 1000);
+        } else {
+            this.setState({ failedAttempt: true });
+            setTimeout(() => {
+                this.setState({ failedAttempt: false });
+            }, 2000);
         }
-        const updateSold = await fetch(autoUrl, fetchConfig1)
-
-        if (response.ok && updateSold.ok) {
-            const alert = document.getElementById("success-message");
-            alert.classList.remove("d-none");
-            const cleared = {
-                price: '',
-                automobile: '',
-                salesPerson: '',
-                customer: '',
-            };
-            this.setState(cleared);
-            this.componentDidMount();
-        }
-    }
-    handleAutomobileChange(event) {
-        const value = event.target.value;
-        this.setState({ automobile: value })
     }
 
     handleSalesPersonChange(event) {
         const value = event.target.value;
-        this.setState({ salesPerson: value })
+        this.setState({ sales_person: value })
     }
 
     handleCustomerChange(event) {
         const value = event.target.value;
         this.setState({ customer: value })
+    }
+
+    handleAutomobileChange(event) {
+        const value = event.target.value;
+        this.setState({ automobile: value })
     }
 
     handlePriceChange(event) {
@@ -98,32 +92,41 @@ class SalesRecordForm extends React.Component {
             const data2 = await response2.json();
             const data3 = await response3.json();
             this.setState({ automobiles: data1.autos, salesPersons: data2.sales_persons, customers: data3.customers });
-            this.setState({
-                unsoldAutos: this.state.automobiles.filter((auto) => { return !auto.is_sold })
-            });
         }
     }
 
-
     render() {
+        let containerClasses = "shadow p-4 mt-4";
+        let addedSalesRecordClasses = "d-none";
+        if (this.state.success) {
+            containerClasses = "d-none";
+            addedSalesRecordClasses = "mt-5 container alert alert-success mb-0";
+        }
+        let failedAttemptClasses = "d-none";
+        if (this.state.failedAttempt) {
+            failedAttemptClasses = "mt-5 container alert alert-danger mb-0";
+        }
         return (
             <div className="row">
                 <div className="offset-3 col-6">
-                    <div className="mt-5 float-right">
-                        <Link to="/sales-record">
-                            <button className="col btn btn-outline-dark btn-rounded"> ↩ Return to Sales History List</button>
-                        </Link>
-                    </div>
-                    <div className="shadow p-4 mt-4">
-                        <h1>Add a New Sales Record</h1>
-                        <form onSubmit={this.handleSubmit} id="create-sales-record-form">
+                    <Link to="/sales-record">
+                        <button
+                            type="button"
+                            className="btn btn-outline-dark btn-md px-4 mt-3"
+                        >
+                            ↩ Return to sales record list
+                        </button>
+                    </Link>
+                    <div className={containerClasses}>
+                        <h1>Update Sales Record Information</h1>
+                        <form onSubmit={this.handleSubmit} id="update-salesrecord-form">
                             <div className="mb-3">
                                 <select value={this.state.automobile} onChange={this.handleAutomobileChange} required name="automobile" id="automobile" className="form-select">
                                     <option value="">Choose an Automobile</option>
-                                    {this.state.unsoldAutos.map(automobile => {
+                                    {this.state.automobiles.map(automobile => {
                                         return (
-                                            <option key={automobile.id} value={automobile.vin}>
-                                                {automobile.model.name}
+                                            <option key={automobile.id} value={automobile.id}>
+                                                {automobile.model.name} - {automobile.vin}
                                             </option>
                                         );
                                     })}
@@ -135,12 +138,12 @@ class SalesRecordForm extends React.Component {
                                 <label htmlFor="price">Price</label>
                             </div>
                             <div className="mb-3">
-                                <select value={this.state.salesPerson} onChange={this.handleSalesPersonChange} required name="sales_person" id="sales_person" className="form-select">
+                                <select value={this.state.sales_person} onChange={this.handleSalesPersonChange} required name="sales_person" id="sales_person" className="form-select">
                                     <option value="">Choose a Sales Person</option>
-                                    {this.state.salesPersons.map(salesPerson => {
+                                    {this.state.salesPersons.map(sales_person => {
                                         return (
-                                            <option key={salesPerson.id} value={salesPerson.employee_number}>
-                                                {salesPerson.name}
+                                            <option key={sales_person.id} value={sales_person.id}>
+                                                {sales_person.name}
                                             </option>
                                         );
                                     })}
@@ -158,16 +161,22 @@ class SalesRecordForm extends React.Component {
                                     })}
                                 </select>
                             </div>
-                            <button className="btn btn-dark">Create</button>
+                            <button className="btn btn-dark">Edit</button>
                         </form>
-                        <div className="alert alert-success d-none mb-0" id="success-message">
-                            Sales Record created!
-                        </div>
+                    </div>
+                    <div
+                        className={addedSalesRecordClasses}
+                        id="updated-salesrecord-message"
+                    >
+                        Sales Record has been updated.
+                    </div>
+                    <div className={failedAttemptClasses} id="failed-attempt-message">
+                        Error updating sales record.
                     </div>
                 </div>
             </div>
-        )
+        );
     }
 }
 
-export default SalesRecordForm;
+export default withExtras(SalesRecordEdit);

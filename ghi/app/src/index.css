@@ -13,15 +13,22 @@ code {
 }
 
 ul.dropdown-menu {
-  background-color: #198754;
+  background-color: black;
 }
 
-.dropdown-item.active, .dropdown-item:active {
+.dropdown-item.active,
+.dropdown-item:active {
   color: #fff;
   text-decoration: none;
-  background-color: #0d6efd;
+  background-color: red;
 }
 
 .dropdown-item {
   color: #fff;
+}
+
+.logo-image {
+  width: 9rem;
+  height: 3rem;
+  overflow: hidden;
 }

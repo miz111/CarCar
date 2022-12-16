@@ -4,6 +4,7 @@ from common.json import ModelEncoder
 import json
 from django.http import JsonResponse
 from django.views.decorators.http import require_http_methods
+from django.db.models import ProtectedError
 
 
 class AutomobileListEncoder(ModelEncoder):
@@ -54,8 +55,14 @@ def api_show_sales_person(request, pk):
             safe=False,
         )
     elif request.method == "DELETE":
-        count, _ = SalesPerson.objects.filter(id=pk).delete()
-        return JsonResponse({"deleted": count > 0})
+        try:
+            count, _ = SalesPerson.objects.filter(id=pk).delete()
+            return JsonResponse({"deleted": count > 0})
+        except ProtectedError:
+            return JsonResponse(
+                {"message": "That sales person cannot be deleted."},
+                status=400,
+            )
     elif request.method == "PUT":
         content = json.loads(request.body)
         SalesPerson.objects.filter(id=pk).update(**content)
@@ -93,8 +100,14 @@ def api_show_customer(request, pk):
             safe=False,
         )
     elif request.method == "DELETE":
-        count, _ = Customer.objects.filter(id=pk).delete()
-        return JsonResponse({"deleted": count > 0})
+        try:
+            count, _ = Customer.objects.filter(id=pk).delete()
+            return JsonResponse({"deleted": count > 0})
+        except ProtectedError:
+            return JsonResponse(
+                {"message": "Customer cannot be deleted."},
+                status=400,
+            )
     elif request.method == "PUT":
         content = json.loads(request.body)
         Customer.objects.filter(id=pk).update(**content)

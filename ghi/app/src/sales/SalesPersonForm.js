@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from "react-router-dom";
 
 class SalesPersonForm extends React.Component {
     constructor(props) {
@@ -51,6 +52,11 @@ class SalesPersonForm extends React.Component {
         return (
             <div className="row">
                 <div className="offset-3 col-6">
+                    <div className="mt-5 float-right">
+                        <Link to="/salesperson">
+                            <button className="col btn btn-outline-dark btn-rounded"> ↩ Return to Sales Person List</button>
+                        </Link>
+                    </div>
                     <div className="shadow p-4 mt-4">
                         <h1>Add a New Sales Person</h1>
                         <form onSubmit={this.handleSubmit} id="create-hat-form">
@@ -64,9 +70,9 @@ class SalesPersonForm extends React.Component {
                                     className="form-control" />
                                 <label htmlFor="color">Employee Number</label>
                             </div>
-                            <button className="btn btn-primary">Create</button>
+                            <button className="btn btn-dark">Create</button>
                         </form>
-                        <div className="alert alert-success d-none mb-0" id="success-message">
+                        <div className="mt-5 alert alert-success d-none mb-0" id="success-message">
                             Sales Person Added!
                         </div>
                     </div>

@@ -1,11 +1,14 @@
 import { NavLink } from "react-router-dom";
 
+
 function Nav() {
   return (
-    <nav className="navbar navbar-expand-lg navbar-dark bg-success">
+    <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
       <div className="container-fluid">
         <NavLink className="navbar-brand" to="/">
-          CarCar
+          <div className="logo-image">
+            <img src={require('./img/car-logo.png')} className="img-fluid" />
+          </div>
         </NavLink>
         <button
           className="navbar-toggler"

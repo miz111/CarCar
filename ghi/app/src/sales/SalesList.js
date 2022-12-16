@@ -21,7 +21,7 @@ const SalesList = () => {
         <>
             <div className="container mt-5">
                 <Link to="/sales-record/new">
-                    <button type="button" className="btn btn-success btn-md px-4">Add Sales Record</button>
+                    <button type="button" className="btn btn-dark btn-md px-4">Add Sales Record</button>
                 </Link>
 
                 <table className="table table-striped table-hover text-center">
@@ -32,6 +32,7 @@ const SalesList = () => {
                             <th>Purchaser Name</th>
                             <th>Automobile VIN</th>
                             <th>Price</th>
+                            <th style={{ width: "5px" }}></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -43,6 +44,11 @@ const SalesList = () => {
                                     <td>{sales_record.customer.name}</td>
                                     <td>{sales_record.automobile.vin}</td>
                                     <td>{sales_record.price}</td>
+                                    <td><Link to={`/sales-record/edit/${sales_record.id}/${sales_record.sales_person.id}/${sales_record.customer.id}/${sales_record.automobile.id}/${sales_record.price}`}>
+                                        <button className="btn btn-outline-dark fw-bold">
+                                            Edit
+                                        </button>
+                                    </Link></td>
                                 </tr>
                             );
                         })}

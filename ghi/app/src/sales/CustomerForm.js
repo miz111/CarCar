@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from "react-router-dom";
 
 
 class CustomerForm extends React.Component {
@@ -60,6 +61,11 @@ class CustomerForm extends React.Component {
         return (
             <div className="row">
                 <div className="offset-3 col-6">
+                    <div className="mt-5 float-right">
+                        <Link to="/customer">
+                            <button className="col btn btn-outline-dark btn-rounded"> ↩ Return to Customer List</button>
+                        </Link>
+                    </div>
                     <div className="shadow p-4 mt-4">
                         <h1>Add a Customer</h1>
                         <form onSubmit={this.handleSubmit} id="create-customer-form">
@@ -76,12 +82,12 @@ class CustomerForm extends React.Component {
                             <div className="form-floating mb-3">
                                 <input value={this.state.phoneNumber} onChange={this.handlePhoneNumberChange} placeholder="Phone Number" required type="text" name="phone_number" id="phone_number"
                                     className="form-control" />
-                                <label htmlFor="name">Phone Number</label>
+                                <label htmlFor="phone_number">Phone Number</label>
                             </div>
 
-                            <button className="btn btn-primary">Create</button>
+                            <button className="btn btn-dark">Create</button>
                         </form>
-                        <div className="alert alert-success d-none mb-0" id="success-message">
+                        <div className="mt-5 alert alert-success d-none mb-0" id="success-message">
                             Customer created!
                         </div>
                     </div>
