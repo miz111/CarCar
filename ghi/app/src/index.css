@@ -20,7 +20,7 @@ ul.dropdown-menu {
 .dropdown-item:active {
   color: #fff;
   text-decoration: none;
-  background-color: red;
+  background-color: #df4759;
 }
 
 .dropdown-item {

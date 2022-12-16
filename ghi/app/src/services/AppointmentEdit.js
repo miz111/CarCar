@@ -111,7 +111,7 @@ class AppointmentEdit extends React.Component {
           <Link to="/appointments">
             <button
               type="button"
-              className="btn btn-secondary btn-md px-4 mt-3"
+              className="btn btn-outline-dark btn-md px-4 mt-3"
             >
               ↩ Return to appointments list
             </button>
@@ -214,7 +214,7 @@ class AppointmentEdit extends React.Component {
                 <label htmlFor="reason">Reason</label>
               </div>
 
-              <button className="btn btn-primary">Create</button>
+              <button className="btn btn-dark">Create</button>
             </form>
           </div>
           <div

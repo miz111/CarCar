@@ -21,7 +21,7 @@ const ManufacturerList = () => {
     <>
       <div className="container col-7 mt-5">
         <Link to="/manufacturers/new">
-          <button type="button" className="btn btn-success btn-md px-4">
+          <button type="button" className="btn btn-dark btn-md px-4">
             Add Manufacturer
           </button>
         </Link>

@@ -37,15 +37,12 @@ class AppointmentList extends React.Component {
 
   editAppointment(service_appointment) {
     this.props.useNavigate(
-      `/appointments/edit/${service_appointment.id}/${
-        service_appointment.vin
-      }/${
-        service_appointment.customer_name
+      `/appointments/edit/${service_appointment.id}/${service_appointment.vin
+      }/${service_appointment.customer_name
       }/${service_appointment.date_time.substr(
         0,
         10
-      )}/${service_appointment.date_time.substr(11, 5)}/${
-        service_appointment.technician.employee_number
+      )}/${service_appointment.date_time.substr(11, 5)}/${service_appointment.technician.employee_number
       }/${service_appointment.reason}`
     );
   }
@@ -170,13 +167,12 @@ class AppointmentList extends React.Component {
             <input
               type="text"
               className="form-control"
-              placeholder={`Filter by... ${
-                this.state.filterCriteria === "customer_name"
-                  ? "customer name"
-                  : this.state.filterCriteria === "Filter"
+              placeholder={`Filter by... ${this.state.filterCriteria === "customer_name"
+                ? "customer name"
+                : this.state.filterCriteria === "Filter"
                   ? "filter"
                   : this.state.filterCriteria
-              }`}
+                }`}
               id="searchTerm"
               value={this.state.searchTerm}
               onChange={this.handleSearchChange}
@@ -187,17 +183,17 @@ class AppointmentList extends React.Component {
         </div>
         <h1>Service appointments</h1>
         <Link to="/appointments/new">
-          <button type="button" className="btn btn-success btn-md px-4">
+          <button type="button" className="btn btn-dark btn-md px-4">
             Add appointment
           </button>
         </Link>
         <Link to="/appointments/history">
-          <button type="button" className="btn btn-secondary btn-md px-4 mx-2">
+          <button type="button" className="btn btn-outline-dark btn-md px-4 mx-2">
             Service history
           </button>
         </Link>
         <Link to="/appointments/filter">
-          <button type="button" className="btn btn-secondary btn-md px-4">
+          <button type="button" className="btn btn-outline-dark btn-md px-4">
             Service history (live filter)
           </button>
         </Link>
@@ -268,7 +264,7 @@ class AppointmentList extends React.Component {
                           type="button"
                           onClick={this.deleteAppointment}
                           value={service_appointment.href}
-                          className="btn btn-danger fw-bold"
+                          className="btn btn-outline-danger fw-bold"
                           style={{ fontSize: 12 }}
                         >
                           Cancel
@@ -278,7 +274,7 @@ class AppointmentList extends React.Component {
                           onClick={() => {
                             this.editAppointment(service_appointment);
                           }}
-                          className="btn btn-primary fw-bold"
+                          className="btn btn-outline-dark fw-bold"
                           style={{ fontSize: 12 }}
                         >
                           Edit
@@ -287,7 +283,7 @@ class AppointmentList extends React.Component {
                           type="button"
                           onClick={this.finishAppointment}
                           value={service_appointment.href}
-                          className="btn btn-success fw-bold"
+                          className="btn btn-outline-dark fw-bold"
                           style={{ fontSize: 12 }}
                         >
                           Finish

@@ -70,7 +70,7 @@ class TechnicianEdit extends React.Component {
           <Link to="/technicians">
             <button
               type="button"
-              className="btn btn-secondary btn-md px-4 mt-3"
+              className="btn btn-outline-dark btn-md px-4 mt-3"
             >
               ↩ Return to technicians list
             </button>
@@ -107,7 +107,7 @@ class TechnicianEdit extends React.Component {
                 />
                 <label htmlFor="employee_number">Employee number</label>
               </div>
-              <button className="btn btn-primary">Edit</button>
+              <button className="btn btn-dark">Edit</button>
             </form>
           </div>
           <div

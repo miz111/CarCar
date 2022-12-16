@@ -89,12 +89,12 @@ class VehicleListPicturesNew extends React.Component {
       <div className="container mt-5">
         <h1>Vehicles List</h1>
         <Link to="/vehicles/new">
-          <button type="button" className="btn btn-success btn-md px-4">
+          <button type="button" className="btn btn-dark btn-md px-4">
             Add vehicle
           </button>
         </Link>
         <Link to="/vehicles">
-          <button type="button" className="btn btn-success btn-md px-4 mx-2">
+          <button type="button" className="btn btn-outline-dark btn-md px-4 mx-2">
             Switch views
           </button>
         </Link>

@@ -65,7 +65,7 @@ class TechnicianList extends React.Component {
       <div className="container col-7 mt-5">
         <h1>Technicians List</h1>
         <Link to="/technicians/new">
-          <button type="button" className="btn btn-success btn-md px-4">
+          <button type="button" className="btn btn-dark btn-md px-4">
             Add technician
           </button>
         </Link>
@@ -93,15 +93,15 @@ class TechnicianList extends React.Component {
                   <td>{technician.name}</td>
                   <td>{technician.employee_number}</td>
                   <td><Link to={`/technicians/edit/${technician.id}/${technician.employee_number}/${technician.name}`}>
-                    <button className="btn btn-primary fw-bold">
+                    <button className="btn btn-outline-dark fw-bold">
                       Edit
                     </button>
-                    </Link></td>
+                  </Link></td>
                   <td>
                     <button
                       onClick={this.deleteTechnician}
                       value={technician.href}
-                      className="btn btn-danger fw-bold"
+                      className="btn btn-outline-danger fw-bold"
                     >
                       X
                     </button>

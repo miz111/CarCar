@@ -88,7 +88,7 @@ class ManufacturerForm extends React.Component {
                 />
                 <label htmlFor="name">Name</label>
               </div>
-              <button className="btn btn-primary">Create</button>
+              <button className="btn btn-dark">Create</button>
             </form>
           </div>
           <div

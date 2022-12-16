@@ -40,7 +40,7 @@ class AutomobileList extends React.Component {
       <div className="container mt-5">
         <h1>Automobiles List</h1>
         <Link to="/automobiles/new">
-          <button type="button" className="btn btn-success btn-md px-4">
+          <button type="button" className="btn btn-dark btn-md px-4">
             Add automobile
           </button>
         </Link>
@@ -70,7 +70,7 @@ class AutomobileList extends React.Component {
                     <button
                       onClick={this.deleteAutomobile}
                       value={auto.href}
-                      className="btn btn-danger fw-bold"
+                      className="btn btn-outline-danger fw-bold"
                     >
                       X
                     </button>
