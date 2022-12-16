@@ -87,7 +87,7 @@ def api_automobile(request, vin):
 @require_http_methods(["GET", "POST"])
 def api_manufacturers(request):
     if request.method == "GET":
-        manufacturers = Manufacturer.objects.all()
+        manufacturers = Manufacturer.objects.all().order_by('name')
         return JsonResponse(
             {"manufacturers": manufacturers},
             encoder=ManufacturerEncoder,
@@ -158,7 +158,7 @@ def api_manufacturer(request, pk):
 @require_http_methods(["GET", "POST"])
 def api_vehicle_models(request):
     if request.method == "GET":
-        models = VehicleModel.objects.all()
+        models = VehicleModel.objects.all().order_by('manufacturer__name', 'name')
         return JsonResponse(
             {"models": models},
             encoder=VehicleModelEncoder

@@ -1,6 +1,27 @@
 import React from "react";
 import { Link } from "react-router-dom";
 
+function VehicleColumns(props) {
+  const vehicleColumns = [[], [], [], []];
+
+  let i = 0;
+  for (const model of props.list) {
+    vehicleColumns[i].push(model);
+    i++;
+    if (i > 3) {
+      i = 0;
+    }
+  }
+
+  return (
+    <>
+      {vehicleColumns.map((vehicleList, index) => {
+        return <VehicleColumn key={index} list={vehicleList} />;
+      })}
+    </>
+  );
+}
+
 function VehicleColumn(props) {
   return (
     <div className="col" style={{ minWidth: "200px" }}>
@@ -10,14 +31,11 @@ function VehicleColumn(props) {
             <img
               src={data.picture_url}
               className="card-img-top"
-              style={{ maxHeight: "150px", objectFit: "cover" }}
+              style={{ maxHeight: "111px", objectFit: "cover" }}
               alt={data.picture_url}
             />
             <div className="card-body">
               <h5 className="card-title">{data.name}</h5>
-              <h6 className="card-subtitle mb-2 text-muted">
-                {data.manufacturer.name}
-              </h6>
             </div>
           </div>
         );
@@ -26,12 +44,13 @@ function VehicleColumn(props) {
   );
 }
 
-class VehicleListPictures extends React.Component {
+class VehicleListPicturesNew extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       models: [],
       vehicleColumns: [],
+      manufacturersList: [],
     };
     this.deleteVehicle = this.deleteVehicle.bind(this);
   }
@@ -49,23 +68,16 @@ class VehicleListPictures extends React.Component {
 
   async componentDidMount() {
     const vehiclesUrl = "http://localhost:8100/api/models/";
+    const manufacturersUrl = "http://localhost:8100/api/manufacturers/";
 
     try {
-      const response = await fetch(vehiclesUrl);
-      if (response.ok) {
-        const data = await response.json();
-        this.setState({ ...data }, () => {
-          const vehicleColumns = [[], [], []];
-          let i = 0;
-          for (const model of this.state.models) {
-            vehicleColumns[i].push(model);
-            i++;
-            if (i > 2) {
-              i = 0;
-            }
-          }
-          this.setState({ vehicleColumns: vehicleColumns });
-        });
+      const vehiclesResponse = await fetch(vehiclesUrl);
+      const manufacturerResponse = await fetch(manufacturersUrl);
+      if (vehiclesResponse.ok && manufacturerResponse.ok) {
+        const vehiclesList = await vehiclesResponse.json();
+        this.setState({ vehiclesList: vehiclesList.models });
+        const manufacturersList = await manufacturerResponse.json();
+        this.setState({ manufacturersList: manufacturersList.manufacturers });
       }
     } catch (e) {
       console.error(e);
@@ -87,8 +99,22 @@ class VehicleListPictures extends React.Component {
           </button>
         </Link>
         <div className="row mt-4">
-          {this.state.vehicleColumns.map((vehicleList, index) => {
-            return <VehicleColumn key={index} list={vehicleList} />;
+          {this.state.manufacturersList.map((manufacturer, index) => {
+            return (
+              <div key={index}>
+                <h4>{manufacturer.name}</h4>
+                <hr className="hr" />
+                <div className="row mt-4">
+                  {
+                    <VehicleColumns
+                      list={this.state.vehiclesList.filter(
+                        (x) => x.manufacturer.name === manufacturer.name
+                      )}
+                    />
+                  }
+                </div>
+              </div>
+            );
           })}
         </div>
       </div>
@@ -96,4 +122,4 @@ class VehicleListPictures extends React.Component {
   }
 }
 
-export default VehicleListPictures;
+export default VehicleListPicturesNew;

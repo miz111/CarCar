@@ -1,8 +1,13 @@
 import React from "react";
-import { Link } from "react-router-dom";
-import Button from 'react-bootstrap/Button';
-import Modal from 'react-bootstrap/Modal';
+import { useParams, useNavigate, Link } from "react-router-dom";
+// import Button from 'react-bootstrap/Button';
+// import Modal from 'react-bootstrap/Modal';
 
+function withExtras(Component) {
+  return (props) => (
+    <Component {...props} params={useParams()} useNavigate={useNavigate()} />
+  );
+}
 class AppointmentList extends React.Component {
   constructor(props) {
     super(props);
@@ -13,6 +18,7 @@ class AppointmentList extends React.Component {
       service_appointments_copy: [],
     };
     this.deleteAppointment = this.deleteAppointment.bind(this);
+    this.editAppointment = this.editAppointment.bind(this);
     this.finishAppointment = this.finishAppointment.bind(this);
     this.handleSearchChange = this.handleSearchChange.bind(this);
     this.handleFilterChange = this.handleFilterChange.bind(this);
@@ -27,6 +33,21 @@ class AppointmentList extends React.Component {
         this.componentDidMount();
       }
     }
+  }
+
+  editAppointment(service_appointment) {
+    this.props.useNavigate(
+      `/appointments/edit/${service_appointment.id}/${
+        service_appointment.vin
+      }/${
+        service_appointment.customer_name
+      }/${service_appointment.date_time.substr(
+        0,
+        10
+      )}/${service_appointment.date_time.substr(11, 5)}/${
+        service_appointment.technician.employee_number
+      }/${service_appointment.reason}`
+    );
   }
 
   async finishAppointment(event) {
@@ -152,7 +173,9 @@ class AppointmentList extends React.Component {
               placeholder={`Filter by... ${
                 this.state.filterCriteria === "customer_name"
                   ? "customer name"
-                  : this.state.filterCriteria === "Filter" ? "filter" : this.state.filterCriteria
+                  : this.state.filterCriteria === "Filter"
+                  ? "filter"
+                  : this.state.filterCriteria
               }`}
               id="searchTerm"
               value={this.state.searchTerm}
@@ -178,7 +201,10 @@ class AppointmentList extends React.Component {
             Service history (live filter)
           </button>
         </Link>
-        <table className="table table-striped table-hover text-center">
+        <table
+          className="table table-striped table-hover text-center"
+          style={{ fontSize: 12 }}
+        >
           <thead>
             <tr>
               <th style={{ width: "0px" }}>VIN</th>
@@ -217,8 +243,9 @@ class AppointmentList extends React.Component {
                     <td className="text-capitalize">
                       {service_appointment.technician.name}
                     </td>
-                    <td className="text-capitalize">
-                      {service_appointment.reason}
+                    <td>
+                      {service_appointment.reason.charAt(0).toUpperCase() +
+                        service_appointment.reason.slice(1)}
                     </td>
                     <td>
                       <div
@@ -242,14 +269,26 @@ class AppointmentList extends React.Component {
                           onClick={this.deleteAppointment}
                           value={service_appointment.href}
                           className="btn btn-danger fw-bold"
+                          style={{ fontSize: 12 }}
                         >
                           Cancel
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            this.editAppointment(service_appointment);
+                          }}
+                          className="btn btn-primary fw-bold"
+                          style={{ fontSize: 12 }}
+                        >
+                          Edit
                         </button>
                         <button
                           type="button"
                           onClick={this.finishAppointment}
                           value={service_appointment.href}
                           className="btn btn-success fw-bold"
+                          style={{ fontSize: 12 }}
                         >
                           Finish
                         </button>
@@ -265,4 +304,4 @@ class AppointmentList extends React.Component {
   }
 }
 
-export default AppointmentList;
+export default withExtras(AppointmentList);
