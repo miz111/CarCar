@@ -32,3 +32,15 @@ ul.dropdown-menu {
   height: 3rem;
   overflow: hidden;
 }
+
+.carousel_image {
+  width: 75%;
+}
+
+.carousel-control-prev {
+  filter: invert(100%);
+}
+
+.carousel-control-next {
+  filter: invert(100%);
+}
