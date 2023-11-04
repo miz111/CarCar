@@ -33,6 +33,20 @@ function HomeCarousel() {
           alt="home page picture of dog"
         ></img>
       </Carousel.Item>
+      <Carousel.Item>
+        <img
+          className="carousel_image"
+          src="dog4.jpeg"
+          alt="home page picture of dog"
+        ></img>
+      </Carousel.Item>
+      <Carousel.Item>
+        <img
+          className="carousel_image"
+          src="dog5.jpeg"
+          alt="home page picture of dog"
+        ></img>
+      </Carousel.Item>
     </Carousel>
   );
 }
