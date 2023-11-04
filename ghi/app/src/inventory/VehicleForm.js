@@ -79,7 +79,7 @@ class VehicleForm extends React.Component {
       <div className="row">
         <div className="offset-3 col-6">
           <div className="mt-5 float-right">
-            <Link to="/vehicles">
+            <Link to="/vehicles/picture-view">
               <button className="col btn btn-outline-dark btn-rounded">
                 ↩ Return to Automobile Models
               </button>
@@ -102,19 +102,6 @@ class VehicleForm extends React.Component {
                 />
                 <label htmlFor="name">Name</label>
               </div>
-              <div className="form-floating mb-3">
-                <input
-                  value={this.state.picture_url}
-                  onChange={this.handleInputChange}
-                  placeholder="Picture URL"
-                  required
-                  type="url"
-                  name="picture_url"
-                  id="picture_url"
-                  className="form-control"
-                />
-                <label htmlFor="picture_url">Picture URL</label>
-              </div>
               <div className="mb-3">
                 <select
                   value={this.state.manufacturer_id}
@@ -133,6 +120,19 @@ class VehicleForm extends React.Component {
                     );
                   })}
                 </select>
+              </div>
+              <div className="form-floating mb-3">
+                <input
+                  value={this.state.picture_url}
+                  onChange={this.handleInputChange}
+                  placeholder="Picture URL"
+                  required
+                  type="url"
+                  name="picture_url"
+                  id="picture_url"
+                  className="form-control"
+                />
+                <label htmlFor="picture_url">Picture URL</label>
               </div>
               <button className="btn btn-dark">Create</button>
             </form>
