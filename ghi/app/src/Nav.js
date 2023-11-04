@@ -42,7 +42,10 @@ function Nav() {
                   </NavLink>
                 </li>
                 <li className="nav-item">
-                  <NavLink className="dropdown-item" to="/vehicles">
+                  <NavLink
+                    className="dropdown-item"
+                    to="/vehicles/picture-view"
+                  >
                     Vehicles
                   </NavLink>
                 </li>
