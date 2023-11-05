@@ -51,7 +51,7 @@ const SalesList = () => {
                     <Link
                       to={`/sales-record/edit/${sales_record.id}/${sales_record.sales_person.id}/${sales_record.customer.id}/${sales_record.automobile.id}/${sales_record.price}`}
                     >
-                      <button className="btn btn-outline-dark fw-bold">
+                      <button className="btn btn-outline-dark fw-bold btn-sm">
                         Edit
                       </button>
                     </Link>

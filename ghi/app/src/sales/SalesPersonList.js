@@ -63,7 +63,7 @@ const SalesPersonList = () => {
                     <Link
                       to={`/salesperson/edit/${sales_person.id}/${sales_person.name}/${sales_person.employee_number}`}
                     >
-                      <button className="btn btn-outline-dark fw-bold">
+                      <button className="btn btn-outline-dark fw-bold btn-sm">
                         Edit
                       </button>
                     </Link>
@@ -71,7 +71,7 @@ const SalesPersonList = () => {
                   <td>
                     <button
                       type="button"
-                      className="btn btn-outline-danger fw-bold"
+                      className="btn btn-outline-danger fw-bold btn-sm"
                       onClick={() => deleteSalesPerson(sales_person.id)}
                     >
                       X
