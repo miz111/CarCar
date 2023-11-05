@@ -23,7 +23,7 @@ const SalesPersonList = () => {
       const alert = document.getElementById("success-message");
       alert.classList.remove("d-none");
       getSalesPersons();
-      const data = await response.json();
+      // const data = await response.json();
     } else {
       const alert = document.getElementById("failure-message");
       alert.classList.remove("d-none");
