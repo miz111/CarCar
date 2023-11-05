@@ -52,6 +52,7 @@ class AutomobileList extends React.Component {
               <th>Year</th>
               <th>Model</th>
               <th>Manufacturer</th>
+              <th>Status</th>
               <th></th>
             </tr>
           </thead>
@@ -66,6 +67,20 @@ class AutomobileList extends React.Component {
                   <td className="text-capitalize">
                     {auto.model.manufacturer.name}
                   </td>
+                  {(() => {
+                    switch (auto.is_sold) {
+                      case true:
+                        return <td className="text-capitalize">Sold</td>;
+                      case false:
+                        return <td className="text-capitalize">Available</td>;
+                      default:
+                        return (
+                          <td className="text-capitalize">
+                            Check with manager
+                          </td>
+                        );
+                    }
+                  })()}
                   <td>
                     <button
                       onClick={this.deleteAutomobile}
