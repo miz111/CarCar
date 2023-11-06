@@ -88,7 +88,7 @@ class SalesPersonForm extends React.Component {
                   onChange={this.handleEmployeeNumberChange}
                   placeholder="Employee Number"
                   required
-                  type="text"
+                  type="number"
                   name="employee_number"
                   id="employee_number"
                   className="form-control"
