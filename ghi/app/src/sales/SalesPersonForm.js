@@ -104,11 +104,10 @@ class SalesPersonForm extends React.Component {
               Sales Person Added!
             </div>
             <div
-              className="mt-5 alert alert-warning d-none mb-0"
+              className="mt-5 alert alert-danger d-none mb-0"
               id="error-message"
             >
-              Unable to add sales person. Please validate employee number is not
-              already in use.
+              Unable to add sales person. Employee number already in use.
             </div>
           </div>
         </div>

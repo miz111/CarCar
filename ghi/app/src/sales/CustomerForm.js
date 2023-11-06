@@ -33,12 +33,17 @@ class CustomerForm extends React.Component {
     if (response.ok) {
       const alert = document.getElementById("success-message");
       alert.classList.remove("d-none");
+      const error_alert = document.getElementById("error-message");
+      error_alert.classList.add("d-none");
       const cleared = {
         name: "",
         address: "",
         phoneNumber: "",
       };
       this.setState(cleared);
+    } else {
+      const alert = document.getElementById("error-message");
+      alert.classList.remove("d-none");
     }
   }
   handleNameChange(event) {
@@ -119,6 +124,12 @@ class CustomerForm extends React.Component {
               id="success-message"
             >
               Customer created!
+            </div>
+            <div
+              className="mt-5 alert alert-danger d-none mb-0"
+              id="error-message"
+            >
+              Failed to add customer. Phone number already in use.
             </div>
           </div>
         </div>
