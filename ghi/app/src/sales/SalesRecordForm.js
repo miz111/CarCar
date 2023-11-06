@@ -151,7 +151,7 @@ class SalesRecordForm extends React.Component {
                   onChange={this.handlePriceChange}
                   placeholder="Price"
                   required
-                  type="text"
+                  type="number"
                   name="price"
                   id="price"
                   className="form-control"
@@ -202,7 +202,7 @@ class SalesRecordForm extends React.Component {
               <button className="btn btn-dark">Create</button>
             </form>
             <div
-              className="alert alert-success d-none mb-0"
+              className="mt-2 alert alert-success d-none mb-0"
               id="success-message"
             >
               Sales Record created!
